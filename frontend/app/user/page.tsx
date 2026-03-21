@@ -62,7 +62,7 @@ export default function UserPortal() {
   };
 
   return (
-    <main className="fade-in" style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+    <main className="fade-in" style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <div className="glass-card" style={{ maxWidth: '500px', width: '100%' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>
           {isLogin ? "User Login" : "User Registration"}

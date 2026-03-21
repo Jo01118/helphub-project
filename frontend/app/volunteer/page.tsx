@@ -91,7 +91,7 @@ export default function VolunteerPortal() {
   };
 
   return (
-    <main className="fade-in" style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>
+    <main className="fade-in" style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>
       <div className="glass-card" style={{ maxWidth: '500px', width: '100%', borderTop: '5px solid var(--secondary)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--secondary)' }}>
           🤝 Volunteer Portal

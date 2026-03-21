@@ -14,7 +14,7 @@ export default function AccessOptions() {
         </h2>
 
         {/* Buttons Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           <a href="/user" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '1.5rem', fontSize: '1.1rem', backgroundColor: 'var(--primary)' }}>
             👤 {t('user_access')}
           </a>
