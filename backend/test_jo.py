@@ -1,0 +1,1 @@
+import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_core.settings'); django.setup(); from django.contrib.auth import get_user_model; User = get_user_model(); print('Exists:', User.objects.filter(username='jo').exists())  

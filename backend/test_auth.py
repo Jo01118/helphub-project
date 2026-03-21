@@ -1,0 +1,1 @@
+import os, django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_core.settings'); django.setup(); from django.contrib.auth import authenticate; user = authenticate(username='Admin', password='Admin'); print('Auth:', user)  
