@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <main style={{ 
       position: 'relative',
-      minHeight: '100vh', 
+      minHeight: 'calc(100vh - 60px)', 
       display: 'flex', 
       alignItems: 'center',
       backgroundColor: '#0b1120', /* Very deep dark blue/black */
@@ -26,8 +26,8 @@ export default function Home() {
         borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none'
       }} />
 
-      {/* Top Right Language Selector */}
-      <div style={{ position: 'absolute', top: '2rem', right: '2rem', zIndex: 20 }}>
+      {/* Top Right Language Selector - offset for global header */}
+      <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 20 }}>
         <select 
           value={language}
           onChange={(e) => {
@@ -70,11 +70,11 @@ export default function Home() {
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 600, color: '#94a3b8', marginBottom: '10px' }}>{t('helphub')}</div>
           <h1 style={{ 
-            fontSize: 'clamp(3rem, 8vw, 5.5rem)', 
+            fontSize: 'clamp(2rem, 6vw, 4rem)', 
             fontWeight: 900, 
             color: '#f8fafc',
             lineHeight: '1.2',
-            letterSpacing: '-1.5px',
+            letterSpacing: '-1px',
             marginBottom: '10px'
           }}>
             {t('hero_title_1')} <br className="mobile-break" />
@@ -87,7 +87,7 @@ export default function Home() {
             </span>
           </h1>
           <p style={{ 
-            fontSize: 'clamp(1rem, 3vw, 1.25rem)', 
+            fontSize: 'clamp(0.9rem, 2.5vw, 1.15rem)', 
             color: '#94a3b8', 
             fontWeight: 400,
             maxWidth: '650px',

@@ -1,4 +1,4 @@
-import urllib.request, json
+import urllib.request, urllib.error, json
 req = urllib.request.Request(
     'http://127.0.0.1:8000/api/auth/register/',
     data=json.dumps({
@@ -10,5 +10,7 @@ req = urllib.request.Request(
 try:
     with urllib.request.urlopen(req) as f:
         print("Success:", f.read().decode('utf-8'))
+except urllib.error.HTTPError as e:
+    print("Error:", e.read().decode('utf-8'))
 except Exception as e:
-    print("Error:", e.read().decode('utf-8') if hasattr(e, 'read') else str(e))
+    print("Error:", str(e))

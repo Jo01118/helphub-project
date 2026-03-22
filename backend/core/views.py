@@ -16,9 +16,11 @@ def register_user(request):
     
     if is_volunteer:
         # Auto-generate a unique Volunteer Application ID and random password
-        generated_id = f"VOL-{uuid.uuid4().hex[:6].upper()}"
+        id_str = str(uuid.uuid4()).replace('-', '')
+        generated_id = f"VOL-{id_str[:6].upper()}"
         data['username'] = generated_id
-        data['password'] = uuid.uuid4().hex
+        data['password'] = id_str
+
         
     serializer = UserSerializer(data=data)
     if serializer.is_valid():
