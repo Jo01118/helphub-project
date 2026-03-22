@@ -112,14 +112,15 @@ export default function UserPortal() {
   };
 
   return (
-    <main className="fade-in" style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-      <div className="glass-card" style={{ maxWidth: '500px', width: '100%' }}>
+    <main style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>
+      <div className="glass-card" style={{ maxWidth: '400px', width: '100%', borderTop: '5px solid var(--primary)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-          {isForgotPassword ? "Forgot Password" : (isLogin ? "User Login" : "User Registration")}
+          {isForgotPassword ? "Forgot Password" : isLogin ? t('user_login_title') : t('user_register_title')}
         </h2>
         
-        {errorMsg && <div style={{ color: 'white', backgroundColor: 'var(--error)', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>{errorMsg}</div>}
-        {successMsg && <div style={{ color: 'white', backgroundColor: '#2ecc71', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>{successMsg}</div>}
+        <div key={isForgotPassword ? 'forgot' : isLogin ? 'login' : 'register'} className="fade-in">
+        {errorMsg && <div style={{ color: 'var(--error)', marginBottom: '1rem', textAlign: 'center', backgroundColor: 'rgba(231, 76, 60, 0.1)', padding: '10px', borderRadius: '5px' }}>{errorMsg}</div>}
+        {successMsg && <div style={{ color: 'var(--success)', marginBottom: '1rem', textAlign: 'center', backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '10px', borderRadius: '5px' }}>{successMsg}</div>}
 
         {isForgotPassword ? (
           <div>
@@ -180,6 +181,7 @@ export default function UserPortal() {
             </button>
           </form>
         )}
+        </div>
 
         {!isForgotPassword && (
           <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}>

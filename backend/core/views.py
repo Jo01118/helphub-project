@@ -268,10 +268,17 @@ class ReportViewSet(viewsets.ModelViewSet):
                 recipient = report.contact_info
                 
             if recipient:
-                print(f"--- SIMULATED NOTIFICATION ---")
-                print(f"To: {recipient}")
-                print(f"Update: We have received your report. Currently, there are no nearby volunteers available. We will keep you updated.")
-                print(f"------------------------------")
+                print(f"--- SIMULATED NOTIFICATION (No Nearby) ---")
+                message_body = f"Update: We have received your HelpHub report. Currently, there are no nearby volunteers available. We will keep you updated."
+                print(f"To: {recipient}\n{message_body}\n------------------------------")
+                
+                if '@' in recipient:
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    try:
+                        send_mail('HelpHub - Report Status Update', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
+                    except Exception as e:
+                        print(f"Failed to send email: {e}")
 
     def perform_update(self, serializer):
         old_instance = self.get_object()
@@ -287,13 +294,21 @@ class ReportViewSet(viewsets.ModelViewSet):
                 recipient = report.contact_info
                 
             if recipient:
-                print(f"--- SIMULATED NOTIFICATION ---")
-                print(f"To: {recipient}")
-                print(f"Message from Admin regarding Report #{report.id}: {report.admin_message}")
+                print(f"--- SIMULATED NOTIFICATION (Admin Message) ---")
+                message_body = f"Message from Admin regarding Report #{report.id}: {report.admin_message}"
                 if report.status == 'RESOLVED' and report.resolved_proof:
                     proof_url = report.resolved_proof.url if hasattr(report.resolved_proof, 'url') else str(report.resolved_proof)
-                    print(f"Attached Resolution Proof: {proof_url}")
-                print(f"------------------------------")
+                    message_body += f"\n\nAttached Resolution Proof: {proof_url}"
+                    
+                print(f"To: {recipient}\n{message_body}\n------------------------------")
+                
+                if '@' in recipient:
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    try:
+                        send_mail(f'HelpHub - Update on Report #{report.id}', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
+                    except Exception as e:
+                        print(f"Failed to send email: {e}")
                 
 
 class VolunteerProfileViewSet(viewsets.ModelViewSet):
