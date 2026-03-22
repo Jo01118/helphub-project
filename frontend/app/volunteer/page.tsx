@@ -203,8 +203,8 @@ export default function VolunteerPortal() {
               </>
             ) : (
               <>
-                <input type="text" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="new-password" />
-                <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+                <input type="text" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="username" />
+                <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
                 <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
                   {loading ? 'Processing...' : 'Login'}
                 </button>

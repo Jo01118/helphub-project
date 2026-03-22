@@ -81,8 +81,8 @@ export default function UserPortal() {
             </>
           )}
           
-          <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="new-password" />
-          <input type="password" placeholder={t('password')} required value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
+          <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete={isLogin ? "username" : "new-password"} />
+          <input type="password" placeholder={t('password')} required value={password} onChange={e => setPassword(e.target.value)} autoComplete={isLogin ? "current-password" : "new-password"} />
           
           {!isLogin && (
             <input type="password" placeholder={t('confirm_password')} required autoComplete="new-password" />

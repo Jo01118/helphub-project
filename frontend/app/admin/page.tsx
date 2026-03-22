@@ -233,8 +233,8 @@ export default function AdminDashboard() {
             <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>Admin Secured Login</h2>
             {loginError && <p style={{ color: 'var(--error)', textAlign: 'center' }}>{loginError}</p>}
             <form onSubmit={handleAdminLogin} autoComplete="off">
-              <input type="text" placeholder="Admin Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="new-password" />
-              <input type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
+              <input type="text" placeholder="Admin Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="username" />
+              <input type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
               <button type="submit" className="btn-primary" style={{ width: '100%', marginBottom: '1rem' }}>Login</button>
             </form>
             <div style={{ textAlign: 'center' }}>
