@@ -145,7 +145,7 @@ export default function VolunteerPortal() {
           🤝 Volunteer Portal
         </h2>
         <p style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-          {mode === 'apply' ? 'Apply to become a volunteer.' : mode === 'status' ? 'Check your application status.' : 'Login to your dashboard.'}
+          {mode === 'apply' ? 'Apply to become a volunteer.' : mode === 'status' ? 'Check your application status.' : mode === 'forgot' ? 'Reset your password.' : 'Login to your dashboard.'}
         </p>
 
         {successMsg && <div style={{ color: 'black', backgroundColor: 'var(--success)', padding: '15px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center', fontWeight: 'bold' }}>{successMsg}</div>}
@@ -273,9 +273,7 @@ export default function VolunteerPortal() {
                 </button>
               </form>
             )}
-            <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setMode('login'); setIsOtpSent(false); setIsOtpVerified(false); setErrorMsg(''); setSuccessMsg(''); }}>
-              Back to Login
-            </p>
+
           </div>
         ) : (
           <form onSubmit={handleSubmit}>

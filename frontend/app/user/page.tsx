@@ -115,7 +115,7 @@ export default function UserPortal() {
     <main className="fade-in" style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <div className="glass-card" style={{ maxWidth: '500px', width: '100%' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-          {isLogin ? "User Login" : "User Registration"}
+          {isForgotPassword ? "Forgot Password" : (isLogin ? "User Login" : "User Registration")}
         </h2>
         
         {errorMsg && <div style={{ color: 'white', backgroundColor: 'var(--error)', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>{errorMsg}</div>}
@@ -181,9 +181,11 @@ export default function UserPortal() {
           </form>
         )}
 
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}>
-          {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
-        </p>
+        {!isForgotPassword && (
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}>
+            {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+          </p>
+        )}
         
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
           <a href="/access">{t('back')}</a>
