@@ -160,10 +160,11 @@ def request_otp(request):
                 f'Your HelpHub Password Reset OTP code is: {code}\nPlease do not share this with anyone.',
                 settings.EMAIL_HOST_USER or 'noreply@helphub.com',
                 [identifier],
-                fail_silently=True,
+                fail_silently=False,
             )
         except Exception as e:
             print(f"Failed to send real email: {e}")
+            return Response({"error": f"Email gateway failed snippet: {str(e)}. Please assure your Render Environment Variables (EMAIL_HOST_USER & EMAIL_HOST_PASSWORD) are correctly set."}, status=500)
     
     # Simulate sending email/SMS in console for debugging and fallback
     print(f"--- SIMULATED NOTIFICATION / DEBUG ---")
