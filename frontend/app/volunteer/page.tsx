@@ -10,6 +10,16 @@ export default function VolunteerPortal() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [mode, setMode] = useState<'apply' | 'login' | 'status' | 'forgot'>('apply');
 
+  useEffect(() => {
+    const token = localStorage.getItem('access');
+    const role = localStorage.getItem('userRole');
+    if (token && role === 'VOLUNTEER') {
+      window.location.href = '/volunteer/dashboard';
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, []);
+
   // Form states
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');

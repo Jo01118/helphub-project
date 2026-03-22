@@ -9,6 +9,16 @@ export default function UserPortal() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
 
+  useEffect(() => {
+    const token = localStorage.getItem('access');
+    const role = localStorage.getItem('userRole');
+    if (token && role === 'USER') {
+      window.location.href = '/user/dashboard';
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, []);
+
   // Form states
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
