@@ -143,7 +143,7 @@ def request_otp(request):
     # Try finding user by email or phone. Excluding admin.
     user = User.objects.filter(models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
     if not user:
-        return Response({"error": "No user found with this email or phone number."}, status=404)
+        return Response({"error": "Not found. Please enter the correct credentials. Only the registered mail/phone should be recognized."}, status=404)
         
     # Generate 6-digit OTP
     code = f"{random.randint(100000, 999999)}"

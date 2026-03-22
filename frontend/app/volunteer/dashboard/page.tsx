@@ -473,7 +473,7 @@ export default function VolunteerDashboard() {
 
             {activeTab === 'nearby' && (
               <div className="fade-in">
-                <h2 style={{ marginBottom: '1.5rem', color: 'var(--text-main)' }}>Nearby Reports (Distance logic sorted)</h2>
+                <h2 style={{ marginBottom: '1.5rem', color: 'var(--text-main)' }}>Nearby Reports</h2>
                 {nearbyReports.length === 0 ? <p className="glass-card">No pending nearby issues. Great job community!</p> : nearbyReports.map(report => (
                   <div key={report.id} className="glass-card" style={{ marginBottom: '1.5rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
