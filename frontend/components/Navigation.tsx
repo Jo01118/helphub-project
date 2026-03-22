@@ -190,7 +190,7 @@ export default function Navigation() {
           bottom: '20px',
           left: '50%',
           transform: 'translateX(-50%)',
-          backgroundColor: 'var(--surface)',
+          backgroundColor: '#0f172a',
           padding: '20px',
           borderRadius: '15px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
