@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   const [filterStatus, setFilterStatus] = useState('ALL');
 
   // Custom Modal
-  const [modalConfig, setModalConfig] = useState<{isOpen: boolean, title: string, message: string, children?: React.ReactNode}>({isOpen: false, title: '', message: ''});
+  const [modalConfig, setModalConfig] = useState<{isOpen: boolean, title: string, message: string, children?: React.ReactNode, hideOk?: boolean}>({isOpen: false, title: '', message: ''});
   const closeModal = () => setModalConfig({isOpen: false, title: '', message: ''});
 
   useEffect(() => {
@@ -128,19 +128,42 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleCustomMessage = async (reportId: number) => {
-    const msg = window.prompt("Enter a message to send to the user for this report:");
-    if (!msg) return;
-    try {
-       await request(`/reports/${reportId}/`, {
-         method: 'PATCH',
-         body: JSON.stringify({ admin_message: msg })
-       });
-       setModalConfig({ isOpen: true, title: 'Success', message: 'Custom message sent to user successfully!' });
-       fetchAdminData();
-    } catch(err) {
-       setModalConfig({ isOpen: true, title: 'Error', message: 'Failed to send Custom message.' });
-    }
+  const handleCustomMessage = (reportId: number) => {
+    setModalConfig({
+       isOpen: true,
+       title: 'Send Custom Message',
+       message: 'Enter a message to send to the user for this report:',
+       hideOk: true,
+       children: (
+          <div style={{ marginTop: '15px' }}>
+             <textarea 
+               id="custom-msg-textarea"
+               rows={4}
+               placeholder="Type your message here..."
+               style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--text-main)', outline: 'none' }}
+             />
+             <div style={{ display: 'flex', gap: '10px', marginTop: '15px', justifyContent: 'flex-end' }}>
+                <button onClick={closeModal} style={{ padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+                <button className="btn-primary" onClick={async () => {
+                   const val = (document.getElementById('custom-msg-textarea') as HTMLTextAreaElement).value.trim();
+                   if (!val) return;
+                   
+                   closeModal();
+                   try {
+                      await request(`/reports/${reportId}/`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ admin_message: val })
+                      });
+                      setModalConfig({ isOpen: true, title: 'Success', message: 'Custom message sent to user successfully!' });
+                      fetchAdminData();
+                   } catch(err) {
+                      setModalConfig({ isOpen: true, title: 'Error', message: 'Failed to send Custom message.' });
+                   }
+                }} style={{ padding: '10px 20px', backgroundColor: '#e67e22', border: 'none' }}>Send To User</button>
+             </div>
+          </div>
+       )
+    });
   }
 
   const handleResolutionMessage = async (reportId: number) => {
@@ -592,9 +615,11 @@ export default function AdminDashboard() {
                <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>{modalConfig.title}</h2>
                <p style={{ fontSize: '1.05rem', color: 'var(--text-main)', marginBottom: '1.5rem', lineHeight: '1.5' }}>{modalConfig.message}</p>
                {modalConfig.children}
-               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-                 <button className="btn-primary" onClick={closeModal} style={{ backgroundColor: 'var(--primary)' }}>OK</button>
-               </div>
+               {!modalConfig.hideOk && (
+                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                   <button className="btn-primary" onClick={closeModal} style={{ backgroundColor: 'var(--primary)' }}>OK</button>
+                 </div>
+               )}
             </div>
          </div>
       )}
