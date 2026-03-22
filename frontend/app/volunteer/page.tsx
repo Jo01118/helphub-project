@@ -118,98 +118,94 @@ export default function VolunteerPortal() {
               Proceed to Dashboard
             </button>
           </div>
-        ) : (
+        ) : mode === 'apply' ? (
           <form onSubmit={handleSubmit} autoComplete="off">
-            {mode === 'apply' ? (
-              <>
-                <input type="text" placeholder={t('name')} required value={name} onChange={(e) => setName(e.target.value)} autoComplete="new-password" />
-                <input type="tel" placeholder={t('phone')} required value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="new-password" />
-                <input type="number" placeholder="Age" required value={age} onChange={(e) => setAge(e.target.value)} autoComplete="new-password" />
-                <div style={{ marginBottom: '1rem', textAlign: 'left', backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
-                  {lat && lng ? (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
-                          📍 Confirmed: {locationCity}
-                        </span>
-                        <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
-                          Coordinates: {parseFloat(lat).toFixed(6)}, {parseFloat(lng).toFixed(6)}
-                        </span>
-                      </div>
-                      <button 
-                        type="button" 
-                        onClick={() => { setLat(''); setLng(''); }} 
-                        style={{ padding: '8px 15px', backgroundColor: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                      >
-                        ✏️ Re-enter location
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <strong style={{ display: 'block', marginBottom: '10px' }}>📍 Search Location:</strong> 
-                      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                        <input 
-                          type="text" 
-                          value={locationCity} 
-                          onChange={e => setLocationCity(e.target.value)} 
-                          placeholder="Type city or area (e.g. Tirupati, Andhra Pradesh)"
-                          style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}
-                        />
-                        <button 
-                          type="button" 
-                          onClick={async () => {
-                            if (!locationCity) {
-                               setErrorMsg('Please enter a location to search.'); return;
-                            }
-                            setLocationLoading(true);
-                            const coords = await searchLocationCoords(locationCity);
-                            if (coords) {
-                               setLat(coords.lat.toString()); setLng(coords.lng.toString());
-                               if (coords.name) setLocationCity(coords.name);
-                            } else {
-                               setErrorMsg('Could not find GPS for this location. Please try adding more details.');
-                            }
-                            setLocationLoading(false);
-                          }} 
-                          className="btn-primary"
-                          disabled={locationLoading}
-                          style={{ padding: '0 20px', borderRadius: '6px' }}
-                        >
-                          {locationLoading ? 'Searching...' : 'Search'}
-                        </button>
-                      </div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                        Please search for a location to view the map and verify your coordinates before submitting.
-                      </span>
-                    </>
-                  )}
+            <input type="text" placeholder={t('name')} required value={name} onChange={(e) => setName(e.target.value)} autoComplete="new-password" />
+            <input type="tel" placeholder={t('phone')} required value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="new-password" />
+            <input type="number" placeholder="Age" required value={age} onChange={(e) => setAge(e.target.value)} autoComplete="new-password" />
+            <div style={{ marginBottom: '1rem', textAlign: 'left', backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
+              {lat && lng ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
+                      📍 Confirmed: {locationCity}
+                    </span>
+                    <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
+                      Coordinates: {parseFloat(lat).toFixed(6)}, {parseFloat(lng).toFixed(6)}
+                    </span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => { setLat(''); setLng(''); }} 
+                    style={{ padding: '8px 15px', backgroundColor: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    ✏️ Re-enter location
+                  </button>
                 </div>
+              ) : (
+                <>
+                  <strong style={{ display: 'block', marginBottom: '10px' }}>📍 Search Location:</strong> 
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                    <input 
+                      type="text" 
+                      value={locationCity} 
+                      onChange={e => setLocationCity(e.target.value)} 
+                      placeholder="Type city or area (e.g. Tirupati, Andhra Pradesh)"
+                      style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={async () => {
+                        if (!locationCity) {
+                           setErrorMsg('Please enter a location to search.'); return;
+                        }
+                        setLocationLoading(true);
+                        const coords = await searchLocationCoords(locationCity);
+                        if (coords) {
+                           setLat(coords.lat.toString()); setLng(coords.lng.toString());
+                           if (coords.name) setLocationCity(coords.name);
+                        } else {
+                           setErrorMsg('Could not find GPS for this location. Please try adding more details.');
+                        }
+                        setLocationLoading(false);
+                      }} 
+                      className="btn-primary"
+                      disabled={locationLoading}
+                      style={{ padding: '0 20px', borderRadius: '6px' }}
+                    >
+                      {locationLoading ? 'Searching...' : 'Search'}
+                    </button>
+                  </div>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    Please search for a location to view the map and verify your coordinates before submitting.
+                  </span>
+                </>
+              )}
+            </div>
 
-                <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-                  <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Upload Resume</label>
-                  <input type="file" required accept=".pdf,.doc,.docx" onChange={(e) => e.target.files && setResume(e.target.files[0])} />
-                </div>
+            <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+              <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Upload Resume</label>
+              <input type="file" required accept=".pdf,.doc,.docx" onChange={(e) => e.target.files && setResume(e.target.files[0])} />
+            </div>
 
-                <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-                  {loading ? 'Processing...' : 'Submit Application'}
-                </button>
-              </>
-            ) : mode === 'status' ? (
-              <>
-                <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="new-password" />
-                <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-                  {loading ? 'Processing...' : 'Check Status'}
-                </button>
-              </>
-            ) : (
-              <>
-                <input type="text" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="username" />
-                <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
-                <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-                  {loading ? 'Processing...' : 'Login'}
-                </button>
-              </>
-            )}
+            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
+              {loading ? 'Processing...' : 'Submit Application'}
+            </button>
+          </form>
+        ) : mode === 'status' ? (
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="new-password" />
+            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
+              {loading ? 'Processing...' : 'Check Status'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <input type="text" name="username" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="username" />
+            <input type="password" name="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
+              {loading ? 'Processing...' : 'Login'}
+            </button>
           </form>
         )}
 

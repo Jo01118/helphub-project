@@ -70,28 +70,30 @@ export default function UserPortal() {
         
         {errorMsg && <div style={{ color: 'white', backgroundColor: 'var(--error)', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>{errorMsg}</div>}
 
-        <form onSubmit={handleSubmit} autoComplete="off">
-          {!isLogin && (
-            <>
-              <input type="text" placeholder={t('name')} value={name} onChange={e => setName(e.target.value)} autoComplete="new-password" />
-              <input type="tel" placeholder={t('phone')} value={phone} onChange={e => setPhone(e.target.value)} autoComplete="new-password" />
-              <input type="email" placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} autoComplete="new-password" />
-              <input type="text" placeholder={t('city')} value={city} onChange={e => setCity(e.target.value)} autoComplete="new-password" />
-              <input type="number" placeholder={t('age')} value={age} onChange={e => setAge(e.target.value)} autoComplete="new-password" />
-            </>
-          )}
-          
-          <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete={isLogin ? "username" : "new-password"} />
-          <input type="password" placeholder={t('password')} required value={password} onChange={e => setPassword(e.target.value)} autoComplete={isLogin ? "current-password" : "new-password"} />
-          
-          {!isLogin && (
+        {isLogin ? (
+          <form onSubmit={handleSubmit}>
+            <input type="text" placeholder="Username" name="username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="username" />
+            <input type="password" placeholder={t('password')} name="password" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
+            <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+              {loading ? 'Processing...' : 'Login'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <input type="text" placeholder={t('name')} value={name} onChange={e => setName(e.target.value)} autoComplete="new-password" />
+            <input type="tel" placeholder={t('phone')} value={phone} onChange={e => setPhone(e.target.value)} autoComplete="new-password" />
+            <input type="email" placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} autoComplete="new-password" />
+            <input type="text" placeholder={t('city')} value={city} onChange={e => setCity(e.target.value)} autoComplete="new-password" />
+            <input type="number" placeholder={t('age')} value={age} onChange={e => setAge(e.target.value)} autoComplete="new-password" />
+            <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="new-password" />
+            <input type="password" placeholder={t('password')} required value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
             <input type="password" placeholder={t('confirm_password')} required autoComplete="new-password" />
-          )}
-
-          <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-            {loading ? 'Processing...' : t('submit')}
-          </button>
-        </form>
+            
+            <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+              {loading ? 'Processing...' : 'Register'}
+            </button>
+          </form>
+        )}
 
         <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}>
           {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
