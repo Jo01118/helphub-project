@@ -533,7 +533,8 @@ export default function UserDashboard() {
 
       {submitSuccess && (
         <div style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: 'var(--success)', color: 'white', padding: '15px 25px', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} className="fade-in">
-          ✅ Issue submitted successfully
+          <div>✅ Issue submitted successfully</div>
+          <div style={{ fontSize: '0.85rem', marginTop: '5px' }}>You will be notified if no volunteers are nearby.</div>
         </div>
       )}
       {submitError && (

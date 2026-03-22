@@ -144,7 +144,7 @@ export default function AnonymousReport() {
       <main className="fade-in" style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--background)' }}>
         <div className="glass-card" style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
           <h2 style={{ color: 'var(--success)', marginBottom: '1rem' }}>✅ Report Submitted Successfully!</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Thank you for helping the community. Your report has been routed to the relevant authorities.</p>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Thank you for helping the community. Your report has been routed to the relevant authorities.<br/><br/>If there are no volunteers nearby, you will be notified via the contact method provided.</p>
           <a href="/" className="btn-primary" style={{ display: 'inline-block' }}>Return Home</a>
         </div>
       </main>

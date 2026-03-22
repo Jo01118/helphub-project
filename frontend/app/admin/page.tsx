@@ -128,6 +128,35 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleCustomMessage = async (reportId: number) => {
+    const msg = window.prompt("Enter a message to send to the user for this report:");
+    if (!msg) return;
+    try {
+       await request(`/reports/${reportId}/`, {
+         method: 'PATCH',
+         body: JSON.stringify({ admin_message: msg })
+       });
+       setModalConfig({ isOpen: true, title: 'Success', message: 'Custom message sent to user successfully!' });
+       fetchAdminData();
+    } catch(err) {
+       setModalConfig({ isOpen: true, title: 'Error', message: 'Failed to send Custom message.' });
+    }
+  }
+
+  const handleResolutionMessage = async (reportId: number) => {
+    try {
+       const msg = "Your reported issue has been successfully resolved! Attached is the proof of resolution from our volunteer. Thank you for using HelpHub.";
+       await request(`/reports/${reportId}/`, {
+         method: 'PATCH',
+         body: JSON.stringify({ admin_message: msg })
+       });
+       setModalConfig({ isOpen: true, title: 'Success', message: 'Resolution update sent to user!' });
+       fetchAdminData();
+    } catch(err) {
+       setModalConfig({ isOpen: true, title: 'Error', message: 'Failed to send resolution message.' });
+    }
+  }
+
   const handleAssign = async (report: any) => {
      try {
         const availableVolunteers = volunteers.filter(v => v.application_status === 'APPROVED' || v.application_status === 'ACCEPTED');
@@ -328,6 +357,12 @@ export default function AdminDashboard() {
                       <span style={{ fontSize: '0.8rem' }}>Lat {report.latitude?.toFixed(4)}, Lng {report.longitude?.toFixed(4)}</span>
                     </div>
 
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '5px', marginBottom: '10px' }}>
+                       <button onClick={() => handleCustomMessage(report.id)} style={{ flex: 1, padding: '8px', backgroundColor: '#e67e22', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+                         ✍️ Send Custom Message
+                       </button>
+                    </div>
+
                     {report.resolved_proof && (
                       <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: 'rgba(46, 204, 113, 0.1)', borderRadius: '8px', border: '1px solid var(--success)' }}>
                         <strong style={{ color: 'var(--success)', display: 'block', marginBottom: '8px' }}>📸 Resolution Proof:</strong>
@@ -335,6 +370,11 @@ export default function AdminDashboard() {
                           <video src={report.resolved_proof.startsWith('http') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} controls style={{ width: '100%', maxHeight: '300px', borderRadius: '8px' }} />
                         ) : (
                           <img src={report.resolved_proof.startsWith('http') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} alt="Resolution Proof" style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px' }} />
+                        )}
+                        {report.status === 'RESOLVED' && (
+                           <button onClick={() => handleResolutionMessage(report.id)} style={{ marginTop: '10px', width: '100%', padding: '10px', backgroundColor: 'var(--success)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+                             📨 Send Resolution Update to User
+                           </button>
                         )}
                       </div>
                     )}

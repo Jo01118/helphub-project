@@ -117,6 +117,79 @@ def get_user_profile(request):
         
     return Response(UserSerializer(user).data)
 
+import random
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def request_otp(request):
+    identifier = request.data.get('identifier') # email or phone
+    if not identifier:
+        return Response({"error": "Email or phone number required."}, status=400)
+    
+    from django.db import models
+    # Try finding user by email or phone. Excluding admin.
+    user = User.objects.filter(models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
+    if not user:
+        return Response({"error": "No user found with this email or phone number."}, status=404)
+        
+    # Generate 6-digit OTP
+    code = f"{random.randint(100000, 999999)}"
+    from .models import OTPCode
+    OTPCode.objects.create(user=user, code=code)
+    
+    # Simulate sending email/SMS
+    print(f"--- SIMULATED NOTIFICATION ---")
+    print(f"To: {identifier}")
+    print(f"OTP for HelpHub Password Reset: {code}")
+    print(f"------------------------------")
+    
+    return Response({"message": "OTP sent successfully."})
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def verify_otp(request):
+    identifier = request.data.get('identifier')
+    code = request.data.get('code')
+    
+    if not identifier or not code:
+        return Response({"error": "Identifier and code required."}, status=400)
+        
+    from django.db import models
+    user = User.objects.filter(models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
+    if not user:
+        return Response({"error": "User not found."}, status=404)
+        
+    from .models import OTPCode
+    otp = OTPCode.objects.filter(user=user, code=code, is_used=False).order_by('-created_at').first()
+    
+    if not otp or not otp.is_valid():
+        return Response({"error": "Invalid or expired OTP."}, status=400)
+        
+    otp.is_used = True
+    otp.save()
+    
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        "message": "OTP verified successfully.",
+        "reset_token": str(refresh.access_token)
+    })
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def reset_password(request):
+    new_password = request.data.get('new_password')
+    if not new_password:
+        return Response({"error": "New password required."}, status=400)
+        
+    user = request.user
+    if user.role == 'ADMIN':
+        return Response({"error": "Admins cannot reset password through this flow."}, status=403)
+        
+    user.set_password(new_password)
+    user.save()
+    
+    return Response({"message": "Password reset successfully."})
+
 class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
     
@@ -135,10 +208,66 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated:
-            serializer.save(reporter=self.request.user)
+            report = serializer.save(reporter=self.request.user)
         else:
-            serializer.save()
+            report = serializer.save()
             
+        import math
+        from .models import VolunteerProfile
+        
+        # Check nearby volunteers
+        volunteers = VolunteerProfile.objects.filter(is_approved=True, is_active=True, working_area_lat__isnull=False, working_area_long__isnull=False)
+        nearby_found = False
+        
+        for v in volunteers:
+            # Haversine distance
+            lat1, lon1 = math.radians(report.latitude), math.radians(report.longitude)
+            lat2, lon2 = math.radians(v.working_area_lat), math.radians(v.working_area_long)
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+            c = 2 * math.asin(math.sqrt(a))
+            distance = c * 6371 # km
+            if distance <= 20: # 20km radius threshold
+                nearby_found = True
+                break
+                
+        if not nearby_found:
+            recipient = ""
+            if report.reporter and (report.reporter.email or report.reporter.phone):
+                recipient = report.reporter.email or report.reporter.phone
+            elif report.contact_info:
+                recipient = report.contact_info
+                
+            if recipient:
+                print(f"--- SIMULATED NOTIFICATION ---")
+                print(f"To: {recipient}")
+                print(f"Update: We have received your report. Currently, there are no nearby volunteers available. We will keep you updated.")
+                print(f"------------------------------")
+
+    def perform_update(self, serializer):
+        old_instance = self.get_object()
+        old_admin_message = getattr(old_instance, 'admin_message', None)
+        
+        report = serializer.save()
+        
+        if report.admin_message and report.admin_message != old_admin_message:
+            recipient = ""
+            if report.reporter and (report.reporter.email or report.reporter.phone):
+                recipient = report.reporter.email or report.reporter.phone
+            elif report.contact_info:
+                recipient = report.contact_info
+                
+            if recipient:
+                print(f"--- SIMULATED NOTIFICATION ---")
+                print(f"To: {recipient}")
+                print(f"Message from Admin regarding Report #{report.id}: {report.admin_message}")
+                if report.status == 'RESOLVED' and report.resolved_proof:
+                    proof_url = report.resolved_proof.url if hasattr(report.resolved_proof, 'url') else str(report.resolved_proof)
+                    print(f"Attached Resolution Proof: {proof_url}")
+                print(f"------------------------------")
+                
+
 class VolunteerProfileViewSet(viewsets.ModelViewSet):
     queryset = VolunteerProfile.objects.all()
     serializer_class = VolunteerProfileSerializer

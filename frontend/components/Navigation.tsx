@@ -36,7 +36,24 @@ export default function Navigation() {
       setShowInstallBtn(true);
     };
     window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+
+    // Listen for successful installation
+    const appInstalledHandler = () => {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Welcome to HelpHub!', {
+          body: 'The application has been successfully installed and is ready to use.',
+          icon: '/icon-192x192.png'
+        });
+      } else {
+        alert('Welcome to HelpHub! The application has been successfully installed and is ready to use.');
+      }
+    };
+    window.addEventListener('appinstalled', appInstalledHandler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', appInstalledHandler);
+    };
   }, []);
 
   const handleInstallClick = async () => {
@@ -45,6 +62,9 @@ export default function Navigation() {
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         setShowInstallBtn(false);
+        if ('Notification' in window && Notification.permission !== 'granted') {
+           Notification.requestPermission();
+        }
       }
       setDeferredPrompt(null);
     }

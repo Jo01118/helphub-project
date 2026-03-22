@@ -7,7 +7,7 @@ import { searchLocationCoords } from '../utils/geocoding';
 
 export default function VolunteerPortal() {
   const { t } = useLanguage();
-  const [mode, setMode] = useState<'apply' | 'login' | 'status'>('apply');
+  const [mode, setMode] = useState<'apply' | 'login' | 'status' | 'forgot'>('apply');
 
   // Form states
   const [name, setName] = useState('');
@@ -25,6 +25,54 @@ export default function VolunteerPortal() {
   const [approvedData, setApprovedData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
+  const handleRequestOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); setErrorMsg(''); setSuccessMsg('');
+    try {
+      const data = await request('/auth/request-otp/', { method: 'POST', body: JSON.stringify({ identifier }) });
+      setIsOtpSent(true);
+      setSuccessMsg('OTP sent! Please check your email or phone.');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error sending OTP. Make sure your email/phone is registered.');
+    } finally { setLoading(false); }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); setErrorMsg(''); setSuccessMsg('');
+    try {
+      const data = await request('/auth/verify-otp/', { method: 'POST', body: JSON.stringify({ identifier, code: otpCode }) });
+      localStorage.setItem('access', data.reset_token);
+      setIsOtpVerified(true);
+      setSuccessMsg('OTP Verified. You can now reset your password.');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Invalid OTP.');
+    } finally { setLoading(false); }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); setErrorMsg(''); setSuccessMsg('');
+    try {
+      await request('/auth/reset-password/', { method: 'POST', body: JSON.stringify({ new_password: newPassword }) });
+      setSuccessMsg('Password reset successfully. Please login.');
+      setTimeout(() => {
+        setMode('login');
+        setIsOtpSent(false);
+        setIsOtpVerified(false);
+        setSuccessMsg('');
+      }, 2000);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error resetting password.');
+    } finally { setLoading(false); }
+  };
 
   // Clear any expired tokens on load to prevent 401s on public forms
   useEffect(() => {
@@ -199,10 +247,45 @@ export default function VolunteerPortal() {
               {loading ? 'Processing...' : 'Check Status'}
             </button>
           </form>
+        ) : mode === 'forgot' ? (
+          <div>
+            {!isOtpSent && !isOtpVerified && (
+              <form onSubmit={handleRequestOtp}>
+                <input type="text" placeholder="Registered Email or Phone" required value={identifier} onChange={e => setIdentifier(e.target.value)} />
+                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
+                  {loading ? 'Processing...' : 'Send OTP'}
+                </button>
+              </form>
+            )}
+            {isOtpSent && !isOtpVerified && (
+              <form onSubmit={handleVerifyOtp}>
+                <input type="text" placeholder="Enter 6-digit OTP" required value={otpCode} onChange={e => setOtpCode(e.target.value)} />
+                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
+                  {loading ? 'Processing...' : 'Verify OTP'}
+                </button>
+              </form>
+            )}
+            {isOtpVerified && (
+              <form onSubmit={handleResetPassword}>
+                <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
+                  {loading ? 'Processing...' : 'Reset Password'}
+                </button>
+              </form>
+            )}
+            <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setMode('login'); setIsOtpSent(false); setIsOtpVerified(false); setErrorMsg(''); setSuccessMsg(''); }}>
+              Back to Login
+            </p>
+          </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <input type="text" name="username" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="username" />
             <input type="password" name="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            
+            <p style={{ textAlign: 'right', marginTop: '0.5rem', marginBottom: '1rem', cursor: 'pointer', color: 'var(--secondary)', fontSize: '0.9rem' }} onClick={() => { setMode('forgot'); setErrorMsg(''); setSuccessMsg(''); }}>
+              Forgot Password?
+            </p>
+
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
               {loading ? 'Processing...' : 'Login'}
             </button>

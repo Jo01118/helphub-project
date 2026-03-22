@@ -61,3 +61,14 @@ class AssignmentRequest(models.Model):
 
     class Meta:
         unique_together = ('report', 'volunteer')
+
+class OTPCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otp_codes')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    def is_valid(self):
+        from django.utils import timezone
+        import datetime
+        return not self.is_used and (timezone.now() - self.created_at) < datetime.timedelta(minutes=10)
