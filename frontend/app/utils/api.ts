@@ -17,6 +17,12 @@ export const request = async (endpoint: string, options: RequestInit = {}) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     
+    if (response.status === 401 && token) {
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      throw new Error("Time out pls login again");
+    }
+    
     if (errorData.detail) throw new Error(errorData.detail);
     if (errorData.error) throw new Error(errorData.error);
     
@@ -50,10 +56,14 @@ export const requestFormData = async (endpoint: string, formData: FormData, meth
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    
+    if (response.status === 401 && token) {
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      throw new Error("Time out pls login again");
+    }
+    
     if (errorData.detail) {
-      if (errorData.detail === "Given token not valid for any token type") {
-        throw new Error("Session timeout. Please login again.");
-      }
       throw new Error(errorData.detail);
     }
     if (errorData.error) throw new Error(errorData.error);

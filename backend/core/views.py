@@ -7,6 +7,19 @@ from .serializers import UserSerializer, VolunteerProfileSerializer, ReportSeria
 from rest_framework.decorators import action
 
 import uuid
+from datetime import timedelta
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    if user.role == 'ADMIN' or user.is_superuser:
+        refresh.set_exp(lifetime=timedelta(days=365))
+        access_token = refresh.access_token
+        access_token.set_exp(lifetime=timedelta(days=365))
+    else:
+        refresh.set_exp(lifetime=timedelta(hours=42))
+        access_token = refresh.access_token
+        access_token.set_exp(lifetime=timedelta(hours=42))
+    return str(refresh), str(access_token)
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -45,10 +58,10 @@ def register_user(request):
                 'message': 'Application submitted successfully.'
             }, status=status.HTTP_201_CREATED)
             
-        refresh = RefreshToken.for_user(user)
+        refresh_token, access_token = get_tokens_for_user(user)
         return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'refresh': refresh_token,
+            'access': access_token,
             'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -68,12 +81,12 @@ def check_volunteer_status(request):
         elif vp.application_status == 'REJECTED':
             return Response({"status": "REJECTED", "message": "Sorry, we regret to tell you you are not selected."})
         elif vp.application_status == 'APPROVED':
-            refresh = RefreshToken.for_user(user)
+            refresh_token, access_token = get_tokens_for_user(user)
             return Response({
                 "status": "APPROVED",
                 "message": "Congratulations, you have been selected as a volunteer!",
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
+                "access": access_token,
+                "refresh": refresh_token,
                 "user": UserSerializer(user).data
             })
     except User.DoesNotExist:
@@ -97,11 +110,11 @@ def update_credentials(request):
     user.save()
     
     # Generate new tokens since credentials changed
-    refresh = RefreshToken.for_user(user)
+    refresh_token, access_token = get_tokens_for_user(user)
     return Response({
         "message": "Credentials updated successfully.",
-        "access": str(refresh.access_token),
-        "refresh": str(refresh)
+        "access": access_token,
+        "refresh": refresh_token
     })
 
 @api_view(['GET', 'PATCH'])
@@ -168,10 +181,10 @@ def verify_otp(request):
     otp.is_used = True
     otp.save()
     
-    refresh = RefreshToken.for_user(user)
+    refresh_token, access_token = get_tokens_for_user(user)
     return Response({
         "message": "OTP verified successfully.",
-        "reset_token": str(refresh.access_token)
+        "reset_token": access_token
     })
 
 @api_view(['POST'])

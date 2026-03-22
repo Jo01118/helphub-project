@@ -1,6 +1,28 @@
 from rest_framework import serializers
 from .models import User, VolunteerProfile, Report, AssignmentRequest
 from django.contrib.auth import authenticate
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from datetime import timedelta
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        refresh = self.get_token(self.user)
+        
+        if self.user.role == 'ADMIN' or self.user.is_superuser:
+            refresh.set_exp(lifetime=timedelta(days=365))
+            access_token = refresh.access_token
+            access_token.set_exp(lifetime=timedelta(days=365))
+        else:
+            refresh.set_exp(lifetime=timedelta(hours=42))
+            access_token = refresh.access_token
+            access_token.set_exp(lifetime=timedelta(hours=42))
+
+        data["refresh"] = str(refresh)
+        data["access"] = str(access_token)
+        
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
