@@ -148,7 +148,8 @@ export default function UserDashboard() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const type = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type });
         setAudioBlobState(audioBlob);
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
@@ -157,10 +158,13 @@ export default function UserDashboard() {
       mediaRecorder.start();
       setIsRecording(true);
       setContactInfo('');
-      if (recognitionRef.current) recognitionRef.current.start();
+      try {
+        if (recognitionRef.current) recognitionRef.current.start();
+      } catch (speechErr) { console.error('Speech recognition start failed', speechErr); }
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('Microphone access denied', err);
+      alert('Microphone access failed: ' + (err.message || 'Permission denied. Please check your browser settings.'));
     }
   };
 

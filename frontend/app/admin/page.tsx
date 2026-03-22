@@ -392,7 +392,8 @@ export default function AdminDashboard() {
           {activeTab === 'volunteers' && (
             <div className="fade-in glass-card">
               <h2>Pending Volunteer Applications</h2>
-              <table style={{ width: '100%', textAlign: 'left', marginTop: '1rem', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto', width: '100%', paddingBottom: '10px' }}>
+              <table style={{ minWidth: '600px', width: '100%', textAlign: 'left', marginTop: '1rem', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border)' }}>
                     <th style={{ padding: '10px' }}>Volunteer / Application ID</th>
@@ -421,9 +422,11 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
 
               <h2 style={{ marginTop: '3rem' }}>Shortlisted & Checked Applications</h2>
-              <table style={{ width: '100%', textAlign: 'left', marginTop: '1rem', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto', width: '100%', paddingBottom: '10px' }}>
+              <table style={{ minWidth: '600px', width: '100%', textAlign: 'left', marginTop: '1rem', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border)' }}>
                     <th style={{ padding: '10px' }}>Volunteer / Application ID</th>
@@ -451,6 +454,7 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
 

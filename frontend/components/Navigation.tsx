@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -8,6 +8,30 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setShowInstallBtn(false);
+      }
+      setDeferredPrompt(null);
+    }
+  };
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -139,6 +163,27 @@ export default function Navigation() {
               </a>
             )
           })}
+          {showInstallBtn && (
+            <button 
+              onClick={handleInstallClick} 
+              style={{ 
+                padding: '12px', 
+                backgroundColor: '#38bdf8', 
+                color: '#0f172a', 
+                border: 'none', 
+                borderRadius: '8px', 
+                fontWeight: 'bold', 
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '1rem'
+              }}
+            >
+              📱 Install App to Home Screen
+            </button>
+          )}
         </div>
       )}
       

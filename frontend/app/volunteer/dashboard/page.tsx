@@ -385,7 +385,7 @@ export default function VolunteerDashboard() {
                     </div>
                     <p style={{ marginBottom: '15px' }}><strong>Issue:</strong> {report.text}</p>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
                       <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '5px' }}>Your Location</p>
                         <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📍 {volLocationName}</strong>
@@ -486,7 +486,7 @@ export default function VolunteerDashboard() {
                       </div>
                     </div>
                     <p style={{ marginBottom: '15px' }}><strong>Issue:</strong> {report.text}</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
                       <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '5px' }}>Your Location</p>
                         <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📍 {volLocationName}</strong>
