@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function AccessOptions() {
   const { t } = useLanguage();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Automatically bypass the gateway if a valid session state is cached in local storage
   useEffect(() => {
@@ -18,8 +19,12 @@ export default function AccessOptions() {
       window.location.href = '/volunteer/dashboard';
     } else if (token && role === 'USER') {
       window.location.href = '/user/dashboard';
+    } else {
+      setIsCheckingAuth(false);
     }
   }, []);
+
+  if (isCheckingAuth) return null;
 
   return (
     <main className="fade-in" style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>

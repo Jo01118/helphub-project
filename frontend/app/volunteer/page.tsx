@@ -7,6 +7,7 @@ import { searchLocationCoords } from '../utils/geocoding';
 
 export default function VolunteerPortal() {
   const { t } = useLanguage();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [mode, setMode] = useState<'apply' | 'login' | 'status' | 'forgot'>('apply');
 
   // Form states
@@ -80,6 +81,8 @@ export default function VolunteerPortal() {
     const role = localStorage.getItem('userRole');
     if (token && role === 'VOLUNTEER') {
       window.location.href = '/volunteer/dashboard';
+    } else {
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -141,6 +144,8 @@ export default function VolunteerPortal() {
       setLoading(false);
     }
   };
+
+  if (isCheckingAuth) return <main style={{ minHeight: '100vh', backgroundColor: 'var(--surface)' }}></main>;
 
   return (
     <main className="fade-in" style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>

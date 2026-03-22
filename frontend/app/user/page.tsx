@@ -6,6 +6,7 @@ import { request } from '../utils/api';
 
 export default function UserPortal() {
   const { t } = useLanguage();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
 
   // Form states
@@ -112,6 +113,8 @@ export default function UserPortal() {
       setLoading(false);
     }
   };
+
+  if (isCheckingAuth) return <main style={{ minHeight: '100vh', backgroundColor: 'var(--surface)' }}></main>;
 
   return (
     <main style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>
