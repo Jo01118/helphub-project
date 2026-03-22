@@ -101,6 +101,8 @@ export default function UserPortal() {
           })
         });
         localStorage.setItem('access', data.access);
+        if (data.refresh) localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('userRole', 'USER');
         window.location.href = '/user/dashboard';
       }
     } catch (err: any) {
@@ -115,7 +117,7 @@ export default function UserPortal() {
     <main style={{ padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: 'var(--surface)' }}>
       <div className="glass-card" style={{ maxWidth: '400px', width: '100%', borderTop: '5px solid var(--primary)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--primary)' }}>
-          {isForgotPassword ? "Forgot Password" : isLogin ? t('user_login_title') : t('user_register_title')}
+          {isForgotPassword ? "Forgot Password" : isLogin ? "User Login" : "User Registration"}
         </h2>
         
         <div key={isForgotPassword ? 'forgot' : isLogin ? 'login' : 'register'} className="fade-in">
@@ -154,8 +156,8 @@ export default function UserPortal() {
           </div>
         ) : isLogin ? (
           <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Username" name="username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="username" />
-            <input type="password" placeholder={t('password')} name="password" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
+            <input type="text" placeholder="Username" name="username_login" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="off" />
+            <input type="password" placeholder={t('password')} name="password_login" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
             
             <p style={{ textAlign: 'right', marginTop: '0.5rem', marginBottom: '1rem', cursor: 'pointer', color: '#38bdf8', fontSize: '0.9rem' }} onClick={() => { setIsForgotPassword(true); setErrorMsg(''); setSuccessMsg(''); }}>
               Forgot Password?

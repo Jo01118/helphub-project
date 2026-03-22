@@ -1,9 +1,25 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function AccessOptions() {
   const { t } = useLanguage();
+
+  // Automatically bypass the gateway if a valid session state is cached in local storage
+  useEffect(() => {
+    const adminToken = localStorage.getItem('admin_access');
+    const token = localStorage.getItem('access');
+    const role = localStorage.getItem('userRole');
+
+    if (adminToken) {
+      window.location.href = '/admin';
+    } else if (token && role === 'VOLUNTEER') {
+      window.location.href = '/volunteer/dashboard';
+    } else if (token && role === 'USER') {
+      window.location.href = '/user/dashboard';
+    }
+  }, []);
 
   return (
     <main className="fade-in" style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>

@@ -74,10 +74,13 @@ export default function VolunteerPortal() {
     } finally { setLoading(false); }
   };
 
-  // Clear any expired tokens on load to prevent 401s on public forms
+  // Auto-redirect valid sessions to dashboard
   useEffect(() => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
+    const token = localStorage.getItem('access');
+    const role = localStorage.getItem('userRole');
+    if (token && role === 'VOLUNTEER') {
+      window.location.href = '/volunteer/dashboard';
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,6 +110,7 @@ export default function VolunteerPortal() {
         });
         localStorage.setItem('access', data.access);
         if (data.refresh) localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('userRole', 'VOLUNTEER');
         window.location.href = '/volunteer/dashboard';
       } else {
         // Registration (Apply without password)
@@ -276,9 +280,9 @@ export default function VolunteerPortal() {
 
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <input type="text" name="username" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="username" />
-            <input type="password" name="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <input type="text" name="username_login" placeholder="Username (or Tracking ID)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="off" />
+            <input type="password" name="password_login" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
             
             <p style={{ textAlign: 'right', marginTop: '0.5rem', marginBottom: '1rem', cursor: 'pointer', color: 'var(--secondary)', fontSize: '0.9rem' }} onClick={() => { setMode('forgot'); setErrorMsg(''); setSuccessMsg(''); }}>
               Forgot Password?
