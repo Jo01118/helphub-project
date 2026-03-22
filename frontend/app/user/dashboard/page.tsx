@@ -52,6 +52,16 @@ export default function UserDashboard() {
       return;
     }
 
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'report' || hash === 'my_reports' || hash === 'profile') {
+        setActiveTab(hash as any);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+
+
     // Initialize Speech Recognition
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -76,6 +86,8 @@ export default function UserDashboard() {
 
     fetchProfile();
     fetchMyReports();
+    
+    return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
   const fetchProfile = async () => {

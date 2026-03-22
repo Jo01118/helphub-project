@@ -14,17 +14,17 @@ export default function AccessOptions() {
         </h2>
 
         {/* Buttons Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <a href="/user" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '1.5rem', fontSize: '1.1rem', backgroundColor: 'var(--primary)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+          <a href="/user" className="btn-primary" style={{ display: 'block', width: '100%', maxWidth: '300px', textAlign: 'center', padding: '1rem', fontSize: '1rem', backgroundColor: 'var(--primary)' }}>
             👤 {t('user_access')}
           </a>
-          <a href="/volunteer" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '1.5rem', fontSize: '1.1rem', backgroundColor: 'var(--secondary)' }}>
+          <a href="/volunteer" className="btn-primary" style={{ display: 'block', width: '100%', maxWidth: '300px', textAlign: 'center', padding: '1rem', fontSize: '1rem', backgroundColor: 'var(--secondary)' }}>
             🤝 {t('volunteer_access')}
           </a>
-          <a href="/admin" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '1.5rem', fontSize: '1.1rem', backgroundColor: 'var(--text-main)' }}>
+          <a href="/admin" className="btn-primary" style={{ display: 'block', width: '100%', maxWidth: '300px', textAlign: 'center', padding: '1rem', fontSize: '1rem', backgroundColor: 'var(--text-main)' }}>
             🏛️ {t('admin_access')}
           </a>
-          <a href="/anonymous" className="btn-primary" style={{ display: 'block', textAlign: 'center', padding: '1.5rem', fontSize: '1.1rem', backgroundColor: '#95a5a6' }}>
+          <a href="/anonymous" className="btn-primary" style={{ display: 'block', width: '100%', maxWidth: '300px', textAlign: 'center', padding: '1rem', fontSize: '1rem', backgroundColor: '#95a5a6' }}>
             🕵️ {t('anonymous_report')}
           </a>
         </div>

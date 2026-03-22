@@ -33,6 +33,16 @@ export default function AdminDashboard() {
       setIsAuthenticated(true);
       fetchAdminData();
     }
+
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'reports' || hash === 'volunteers' || hash === 'stats' || hash === 'requests') {
+        setActiveTab(hash as any);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
   const handleAdminLogin = async (e: React.FormEvent) => {

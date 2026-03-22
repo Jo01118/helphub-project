@@ -47,6 +47,16 @@ export default function VolunteerDashboard() {
       window.location.href = '/volunteer';
       return;
     }
+
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'assigned' || hash === 'nearby' || hash === 'profile' || hash === 'requests') {
+        setActiveTab(hash as any);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+
     
     // Request real location
     if ("geolocation" in navigator) {
@@ -65,6 +75,8 @@ export default function VolunteerDashboard() {
        setVolLat(17.3850);
        setVolLng(78.4867);
     }
+    
+    return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
   useEffect(() => {
