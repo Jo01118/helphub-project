@@ -132,7 +132,8 @@ export default function UserDashboard() {
       setShowOverride(false);
       setSearchQuery('');
     } else {
-      alert("Could not find that location. Please try adding more details (e.g. 'Nagari, Andhra Pradesh').");
+      setSubmitError("Could not find that location. Please try adding more details (e.g. 'Nagari, Andhra Pradesh').");
+      setTimeout(() => setSubmitError(''), 5000);
     }
   };
 
@@ -164,7 +165,8 @@ export default function UserDashboard() {
       
     } catch (err: any) {
       console.error('Microphone access denied', err);
-      alert('Microphone access failed: ' + (err.message || 'Permission denied. Please check your browser settings.'));
+      setSubmitError('Microphone access failed: ' + (err.message || 'Permission denied. Please check your browser settings.'));
+      setTimeout(() => setSubmitError(''), 6000);
     }
   };
 

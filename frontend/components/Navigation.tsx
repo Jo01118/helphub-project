@@ -13,6 +13,9 @@ export default function Navigation() {
   const [showInstallBtn, setShowInstallBtn] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
+    }
     const handler = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
