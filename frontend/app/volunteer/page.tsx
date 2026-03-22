@@ -168,9 +168,9 @@ export default function VolunteerPortal() {
           </div>
         ) : mode === 'apply' ? (
           <form onSubmit={handleSubmit} autoComplete="off">
-            <input type="text" placeholder={t('name')} required value={name} onChange={(e) => setName(e.target.value)} autoComplete="new-password" />
-            <input type="tel" placeholder={t('phone')} required value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="new-password" />
-            <input type="number" placeholder="Age" required value={age} onChange={(e) => setAge(e.target.value)} autoComplete="new-password" />
+            <input type="text" placeholder={t('name')} required value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
+            <input type="tel" placeholder={t('phone')} required value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
+            <input type="number" placeholder="Age" required value={age} onChange={(e) => setAge(e.target.value)} autoComplete="off" />
             <div style={{ marginBottom: '1rem', textAlign: 'left', backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
               {lat && lng ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -242,7 +242,7 @@ export default function VolunteerPortal() {
           </form>
         ) : mode === 'status' ? (
           <form onSubmit={handleSubmit} autoComplete="off">
-            <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="new-password" />
+            <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="off" />
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
               {loading ? 'Processing...' : 'Check Status'}
             </button>

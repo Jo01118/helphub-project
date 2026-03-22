@@ -150,11 +150,26 @@ def request_otp(request):
     from .models import OTPCode
     OTPCode.objects.create(user=user, code=code)
     
-    # Simulate sending email/SMS
-    print(f"--- SIMULATED NOTIFICATION ---")
+    # Send Actual Email if identifier looks like an email
+    if '@' in identifier:
+        from django.core.mail import send_mail
+        from django.conf import settings
+        try:
+            send_mail(
+                'HelpHub - Password Reset OTP',
+                f'Your HelpHub Password Reset OTP code is: {code}\nPlease do not share this with anyone.',
+                settings.EMAIL_HOST_USER or 'noreply@helphub.com',
+                [identifier],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print(f"Failed to send real email: {e}")
+    
+    # Simulate sending email/SMS in console for debugging and fallback
+    print(f"--- SIMULATED NOTIFICATION / DEBUG ---")
     print(f"To: {identifier}")
     print(f"OTP for HelpHub Password Reset: {code}")
-    print(f"------------------------------")
+    print(f"--------------------------------------")
     
     return Response({"message": "OTP sent successfully."})
 

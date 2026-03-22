@@ -166,12 +166,12 @@ export default function UserPortal() {
           </form>
         ) : (
           <form onSubmit={handleSubmit} autoComplete="off">
-            <input type="text" placeholder={t('name')} value={name} onChange={e => setName(e.target.value)} autoComplete="new-password" />
-            <input type="tel" placeholder={t('phone')} value={phone} onChange={e => setPhone(e.target.value)} autoComplete="new-password" />
-            <input type="email" placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} autoComplete="new-password" />
-            <input type="text" placeholder={t('city')} value={city} onChange={e => setCity(e.target.value)} autoComplete="new-password" />
-            <input type="number" placeholder={t('age')} value={age} onChange={e => setAge(e.target.value)} autoComplete="new-password" />
-            <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="new-password" />
+            <input type="text" placeholder={t('name')} value={name} onChange={e => setName(e.target.value)} autoComplete="off" />
+            <input type="tel" placeholder={t('phone')} value={phone} onChange={e => setPhone(e.target.value)} autoComplete="off" />
+            <input type="email" placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
+            <input type="text" placeholder={t('city')} value={city} onChange={e => setCity(e.target.value)} autoComplete="off" />
+            <input type="number" placeholder={t('age')} value={age} onChange={e => setAge(e.target.value)} autoComplete="off" />
+            <input type="text" placeholder="Username" required value={username} onChange={e => setUsername(e.target.value)} autoComplete="off" />
             <input type="password" placeholder={t('password')} required value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
             <input type="password" placeholder={t('confirm_password')} required autoComplete="new-password" />
             
