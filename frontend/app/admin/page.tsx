@@ -8,6 +8,7 @@ import { getLocationName } from '../utils/geocoding';
 export default function AdminDashboard() {
   const { t } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeTab, setActiveTab] = useState<'reports' | 'volunteers' | 'stats' | 'requests'>('reports');
   
   // Login State
@@ -33,6 +34,7 @@ export default function AdminDashboard() {
       setIsAuthenticated(true);
       fetchAdminData();
     }
+    setIsCheckingAuth(false);
 
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
@@ -277,6 +279,8 @@ export default function AdminDashboard() {
        setModalConfig({ isOpen: true, title: 'Error', message: 'Failed to update volunteer status.' });
     }
   };
+
+  if (isCheckingAuth) return <main style={{ minHeight: '100vh', backgroundColor: 'var(--surface)' }}></main>;
 
   if (!isAuthenticated) {
      return (
