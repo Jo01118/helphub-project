@@ -11,10 +11,24 @@ export default function Navigation() {
 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallBtn, setShowInstallBtn] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
+    if (typeof window !== 'undefined') {
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
+      }
+      
+      // Detect if user is on iOS and NOT already in standalone (app) mode
+      const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone;
+      
+      if (isIosDevice && !isStandalone) {
+        // Show our custom iOS instruction modal right away
+        setIsIOS(true);
+        setShowInstallBtn(true);
+      }
     }
     const handler = (e: any) => {
       e.preventDefault();
@@ -166,32 +180,60 @@ export default function Navigation() {
               </a>
             )
           })}
-          {showInstallBtn && (
-            <button 
-              onClick={handleInstallClick} 
-              style={{ 
-                padding: '12px', 
-                backgroundColor: '#38bdf8', 
-                color: '#0f172a', 
-                border: 'none', 
-                borderRadius: '8px', 
-                fontWeight: 'bold', 
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                marginTop: '1rem'
-              }}
-            >
-              📱 Install App to Home Screen
-            </button>
-          )}
+        </div>
+      )}
+
+      {/* Custom Install App Pop-Up Overlay */}
+      {showInstallBtn && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'var(--surface)',
+          padding: '20px',
+          borderRadius: '15px',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
+          zIndex: 99999,
+          width: '90%',
+          maxWidth: '400px',
+          border: '1px solid rgba(56, 189, 248, 0.5)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '15px',
+          animation: 'slideUp 0.5s ease-out'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+             <h3 style={{ margin: '0 0 8px 0', color: '#38bdf8', fontSize: '1.3rem' }}>📱 Install HelpHub!</h3>
+             
+             {isIOS ? (
+               <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main)', lineHeight: '1.4' }}>
+                 To install this app on your iPhone: <br/>
+                 Tap the <strong>Share</strong> icon at the bottom of Safari, then tap <strong>"Add to Home Screen" ➕</strong>.
+               </p>
+             ) : (
+               <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main)' }}>Install our application to your device for a faster, full-screen native experience!</p>
+             )}
+          </div>
+          
+          <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+             <button onClick={() => setShowInstallBtn(false)} style={{ flex: 1, padding: '12px', backgroundColor: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Close</button>
+             {!isIOS && (
+               <button onClick={handleInstallClick} style={{ flex: 2, padding: '12px', backgroundColor: '#38bdf8', border: 'none', color: '#0f172a', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1.05rem' }}>Install Now</button>
+             )}
+          </div>
         </div>
       )}
       
       {/* Spacer to prevent content from going under the fixed header */}
       <div style={{ height: '60px' }}></div>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes slideUp {
+          from { transform: translate(-50%, 150%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+      `}} />
     </>
   );
 }
