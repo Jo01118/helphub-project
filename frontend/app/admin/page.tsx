@@ -250,22 +250,9 @@ export default function AdminDashboard() {
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-main)' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--primary)' }}>🏛️ Admin Control Center</h1>
-        <div><button onClick={() => { localStorage.clear(); window.location.href='/'; }} style={{ color: 'var(--secondary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Logout</button></div>
       </header>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-        <button onClick={() => setActiveTab('reports')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'reports' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'reports' ? '3px solid var(--text-main)' : 'none', fontWeight: 600, color: 'var(--text-main)', borderRadius: 0 }}>
-          📋 Issue Management
-        </button>
-        <button onClick={() => setActiveTab('volunteers')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'volunteers' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'volunteers' ? '3px solid var(--text-main)' : 'none', fontWeight: 600, color: 'var(--text-main)', borderRadius: 0 }}>
-          👥 Volunteers
-        </button>
-        <button onClick={() => setActiveTab('requests')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'requests' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'requests' ? '3px solid var(--text-main)' : 'none', fontWeight: 600, color: 'var(--text-main)', borderRadius: 0 }}>
-          📋 Assignment Requests
-          {assignmentRequests.length > 0 && <span style={{ marginLeft: '8px', backgroundColor: 'var(--error)', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{assignmentRequests.length}</span>}
-        </button>
-      </div>
+      {/* Tabs removed for global hamburger nav */}
 
       <div style={{ padding: '2rem', flex: 1 }}>
         <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>

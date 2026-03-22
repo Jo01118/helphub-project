@@ -259,36 +259,9 @@ export default function UserDashboard() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', padding: '1rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 600 }}>{t('helphub')} - User Dashboard</h1>
-        <div>
-          <button className="btn-primary" style={{ backgroundColor: 'var(--error)', marginRight: '1rem' }} onClick={() => window.location.href = 'tel:112'}>
-            🚨 {t('emergency_call')}
-          </button>
-          <button onClick={handleLogout} style={{ color: 'var(--text-muted)', background: 'transparent', fontWeight: 'bold' }}>Logout</button>
-        </div>
+        <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 600 }}>User Dashboard</h1>
       </header>
-
-      {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-        <button 
-          onClick={() => setActiveTab('report')}
-          style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'report' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'report' ? '3px solid var(--primary)' : 'none', fontWeight: 600, color: activeTab === 'report' ? 'var(--primary)' : 'var(--text-main)', borderRadius: 0 }}
-        >
-          {t('report_issue')}
-        </button>
-        <button 
-          onClick={() => setActiveTab('my_reports')}
-          style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'my_reports' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'my_reports' ? '3px solid var(--primary)' : 'none', fontWeight: 600, color: activeTab === 'my_reports' ? 'var(--primary)' : 'var(--text-main)', borderRadius: 0 }}
-        >
-          {t('my_reports')}
-        </button>
-        <button 
-          onClick={() => setActiveTab('profile')}
-          style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'profile' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'profile' ? '3px solid var(--primary)' : 'none', fontWeight: 600, color: activeTab === 'profile' ? 'var(--primary)' : 'var(--text-main)', borderRadius: 0 }}
-        >
-          My Profile
-        </button>
-      </div>
+      {/* Tabs removed for global navigation */}
 
       {/* Content */}
       <div style={{ padding: '2rem', flex: 1, display: 'flex', justifyContent: 'center' }}>

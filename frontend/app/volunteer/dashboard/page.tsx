@@ -252,8 +252,7 @@ export default function VolunteerDashboard() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', padding: '1rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--secondary)', fontSize: '1.5rem', fontWeight: 600 }}>{t('helphub')} - Volunteer</h1>
-        <button onClick={handleLogout} style={{ color: 'var(--text-muted)', background: 'transparent', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>Logout</button>
+        <h1 style={{ color: 'var(--secondary)', fontSize: '1.5rem', fontWeight: 600 }}>Volunteer Dashboard</h1>
       </header>
 
       {/* Setup Modal */}
@@ -365,21 +364,7 @@ export default function VolunteerDashboard() {
 
       {isLocationConfirmed && (
         <>
-          {/* Tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-        <button onClick={() => setActiveTab('assigned')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'assigned' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'assigned' ? '3px solid var(--secondary)' : 'none', fontWeight: 600, color: activeTab === 'assigned' ? 'var(--secondary)' : 'var(--text-main)', borderRadius: 0 }}>
-          📌 Assigned Issues
-        </button>
-        <button onClick={() => setActiveTab('nearby')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'nearby' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'nearby' ? '3px solid var(--secondary)' : 'none', fontWeight: 600, color: activeTab === 'nearby' ? 'var(--secondary)' : 'var(--text-main)', borderRadius: 0 }}>
-          📍 Nearby Unassigned
-        </button>
-        <button onClick={() => setActiveTab('requests')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'requests' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'requests' ? '3px solid var(--secondary)' : 'none', fontWeight: 600, color: activeTab === 'requests' ? 'var(--secondary)' : 'var(--text-main)', borderRadius: 0 }}>
-          📋 Requested Assignments
-        </button>
-        <button onClick={() => setActiveTab('profile')} style={{ padding: '15px 30px', flex: 1, backgroundColor: activeTab === 'profile' ? 'var(--background)' : 'transparent', borderBottom: activeTab === 'profile' ? '3px solid var(--secondary)' : 'none', fontWeight: 600, color: activeTab === 'profile' ? 'var(--secondary)' : 'var(--text-main)', borderRadius: 0 }}>
-          👤 My Profile
-        </button>
-      </div>
+          {/* Tabs removed for global hamburger nav */}
 
       {loadingReports ? (
         <div style={{ padding: '2rem', textAlign: 'center' }}>Loading tasks securely...</div>
