@@ -141,13 +141,13 @@ def get_user_profile(request):
             RecoveryCode.objects.create(user=user, code=code_str)
 
     if request.method == 'PATCH':
-        serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer = UserSerializer(user, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    return Response(UserSerializer(user).data)
+    return Response(UserSerializer(user, context={'request': request}).data)
 
 import random
 
