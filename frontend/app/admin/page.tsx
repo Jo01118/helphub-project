@@ -283,6 +283,29 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDownloadBase64 = async (dataString: string, filename: string) => {
+      try {
+          if (!dataString.startsWith('data:')) {
+             window.open(dataString.startsWith('http') ? dataString : `http://127.0.0.1:8000${dataString}`, '_blank');
+             return;
+          }
+          const res = await fetch(dataString);
+          const blob = await res.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+         console.error('Failed to download file:', err);
+         setModalConfig({ isOpen: true, title: 'Download Error', message: 'The browser blocked this file download or the file is corrupted.' });
+      }
+  };
+
   if (isCheckingAuth) return <main style={{ minHeight: '100vh', backgroundColor: 'var(--surface)' }}></main>;
 
   if (!isAuthenticated) {
@@ -489,7 +512,7 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '10px', color: 'orange' }}>
                         <strong>{v.application_status}</strong>
-                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} download="Volunteer_Resume" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
+                        {v.resume && <div><a href="#" onClick={(e) => { e.preventDefault(); handleDownloadBase64(v.resume, `Resume_${v.user?.username || 'Volunteer'}`); }} style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
                       </td>
                       <td style={{ padding: '10px' }}>
                         <button onClick={() => handleVolunteerAction(v.id, 'Accept')} style={{ padding: '5px 10px', backgroundColor: 'var(--success)', color: 'white', border: 'none', cursor: 'pointer', marginRight: '5px', borderRadius: '5px' }}>Approve</button>
@@ -522,7 +545,7 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '10px', color: v.application_status === 'APPROVED' ? 'var(--success)' : 'var(--error)' }}>
                         <strong>{v.application_status}</strong>
-                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} download="Volunteer_Resume" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
+                        {v.resume && <div><a href="#" onClick={(e) => { e.preventDefault(); handleDownloadBase64(v.resume, `Resume_${v.user?.username || 'Volunteer'}`); }} style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
                       </td>
                       <td style={{ padding: '10px' }}>
                          <span style={{ color: 'var(--text-muted)' }}>Decision Made</span>
