@@ -106,8 +106,14 @@ export default function VolunteerDashboard() {
       if (data.username && data.username.startsWith('VOL-')) {
         setShowSetupModal(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to parse user profile', err);
+      if (err.message && (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out'))) {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('userRole');
+        window.location.href = '/volunteer';
+      }
     }
   };
 
@@ -133,7 +139,12 @@ export default function VolunteerDashboard() {
       setReports(enhancedData);
     } catch (err: any) {
       console.error(err);
-      if(err.message.includes('token')) window.location.href = '/volunteer';
+      if (err.message && (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out'))) {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('userRole');
+        window.location.href = '/volunteer';
+      }
     } finally {
       setLoadingReports(false);
     }
@@ -201,6 +212,8 @@ export default function VolunteerDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    localStorage.removeItem('userRole');
     window.location.href = '/';
   }
 

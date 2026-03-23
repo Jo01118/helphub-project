@@ -113,7 +113,10 @@ export default function UserDashboard() {
       setReports(enhancedData);
     } catch (err: any) {
       console.error('Failed to fetch reports:', err);
-      if (err.message.includes('token') || err.message.includes('credentials')) {
+      if (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out')) {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('userRole');
         window.location.href = '/user'; // Token likely expired
       }
     } finally {
@@ -234,6 +237,7 @@ export default function UserDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
+    localStorage.removeItem('userRole');
     window.location.href = '/';
   }
 
