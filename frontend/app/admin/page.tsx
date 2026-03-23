@@ -23,7 +23,7 @@ export default function AdminDashboard() {
 
   // Filters
   const [filterStatus, setFilterStatus] = useState('ALL');
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
   // Custom Modal
   const [modalConfig, setModalConfig] = useState<{isOpen: boolean, title: string, message: string, children?: React.ReactNode, hideOk?: boolean}>({isOpen: false, title: '', message: ''});
   const closeModal = () => setModalConfig({isOpen: false, title: '', message: ''});
@@ -65,6 +65,7 @@ export default function AdminDashboard() {
   }
 
   const fetchAdminData = async () => {
+    setIsRefreshing(true);
     try {
       // Temporarily use the standard token for requests in this session
       const token = localStorage.getItem('admin_access');
@@ -85,6 +86,8 @@ export default function AdminDashboard() {
     } catch (err: any) {
       console.error(err);
       if(err.message.includes('token')) setIsAuthenticated(false);
+    } finally {
+      setIsRefreshing(false);
     }
   }
 
@@ -310,8 +313,8 @@ export default function AdminDashboard() {
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-main)' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--primary)' }}>🏛️ Admin Control Center</h1>
-        <button onClick={fetchAdminData} style={{ padding: '8px 16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-          🔄 Refresh Data
+        <button onClick={fetchAdminData} disabled={isRefreshing} style={{ padding: '8px 16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '5px', cursor: isRefreshing ? 'wait' : 'pointer', fontWeight: 'bold' }}>
+          {isRefreshing ? '⏳ Refreshing...' : '🔄 Refresh Data'}
         </button>
       </header>
 
@@ -486,7 +489,7 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '10px', color: 'orange' }}>
                         <strong>{v.application_status}</strong>
-                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 View Resume</a></div>}
+                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} download="Volunteer_Resume" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
                       </td>
                       <td style={{ padding: '10px' }}>
                         <button onClick={() => handleVolunteerAction(v.id, 'Accept')} style={{ padding: '5px 10px', backgroundColor: 'var(--success)', color: 'white', border: 'none', cursor: 'pointer', marginRight: '5px', borderRadius: '5px' }}>Approve</button>
@@ -519,7 +522,7 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ padding: '10px', color: v.application_status === 'APPROVED' ? 'var(--success)' : 'var(--error)' }}>
                         <strong>{v.application_status}</strong>
-                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 View Resume</a></div>}
+                        {v.resume && <div><a href={v.resume.startsWith('http') || v.resume.startsWith('data:') ? v.resume : `http://127.0.0.1:8000${v.resume}`} download="Volunteer_Resume" style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>📄 Download Resume</a></div>}
                       </td>
                       <td style={{ padding: '10px' }}>
                          <span style={{ color: 'var(--text-muted)' }}>Decision Made</span>
