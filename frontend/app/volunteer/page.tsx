@@ -41,9 +41,15 @@ export default function VolunteerPortal() {
   const [identifier, setIdentifier] = useState('');
   const [recoveryCode, setRecoveryCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRecoveryReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
+    }
     setLoading(true); setErrorMsg(''); setSuccessMsg('');
     setWakingServer(false);
     
@@ -269,7 +275,15 @@ export default function VolunteerPortal() {
             <form onSubmit={handleRecoveryReset}>
               <input type="text" placeholder="Username, Email or Phone" required value={identifier} onChange={e => setIdentifier(e.target.value)} />
               <input type="text" placeholder="Enter 1 Recovery Code" required value={recoveryCode} onChange={e => setRecoveryCode(e.target.value)} />
-              <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+              
+              <div style={{ position: 'relative', width: '100%', marginBottom: '10px' }}>
+                <input type={showPassword ? "text" : "password"} placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ width: '100%', paddingRight: '40px' }} />
+                <span onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', userSelect: 'none', fontSize: '1.2rem' }}>
+                  {showPassword ? '👁️' : '🙈'}
+                </span>
+              </div>
+              
+              <input type={showPassword ? "text" : "password"} placeholder="Confirm Password" required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
               
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
                 {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Recover Account & Login'}
