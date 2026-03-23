@@ -51,7 +51,10 @@ def register_user(request):
             vp = VolunteerProfile.objects.create(user=user)
             resume_file = request.FILES.get('resume')
             if resume_file:
-                vp.resume = resume_file
+                import base64
+                b64_data = base64.b64encode(resume_file.read()).decode('utf-8')
+                mime_type = getattr(resume_file, 'content_type', 'application/pdf')
+                vp.resume = f"data:{mime_type};base64,{b64_data}"
                 
             lat = request.data.get('working_area_lat')
             lng = request.data.get('working_area_long')
@@ -201,6 +204,40 @@ class ReportViewSet(viewsets.ModelViewSet):
         if self.action in ['create']:
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        
+        for key in ['photo', 'original_audio']:
+            file_obj = request.FILES.get(key)
+            if file_obj:
+                import base64
+                b64_data = base64.b64encode(file_obj.read()).decode('utf-8')
+                mime_type = getattr(file_obj, 'content_type', 'application/octet-stream')
+                data[key] = f"data:{mime_type};base64,{b64_data}"
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        data = request.data.copy()
+        
+        file_obj = request.FILES.get('resolved_proof')
+        if file_obj:
+            import base64
+            b64_data = base64.b64encode(file_obj.read()).decode('utf-8')
+            mime_type = getattr(file_obj, 'content_type', 'application/octet-stream')
+            data['resolved_proof'] = f"data:{mime_type};base64,{b64_data}"
+            
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated:
