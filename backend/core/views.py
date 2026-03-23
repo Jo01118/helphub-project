@@ -130,6 +130,16 @@ def update_credentials(request):
 @permission_classes([permissions.IsAuthenticated])
 def get_user_profile(request):
     user = request.user
+    
+    if not RecoveryCode.objects.filter(user=user).exists():
+        import string
+        import random
+        for _ in range(4):
+            code_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            while RecoveryCode.objects.filter(code=code_str).exists():
+                code_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            RecoveryCode.objects.create(user=user, code=code_str)
+
     if request.method == 'PATCH':
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
