@@ -28,6 +28,8 @@ export default function AnonymousReport() {
   const [manualText, setManualText] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [wakingServer, setWakingServer] = useState(false);
   const [toastMsg, setToastMsg] = useState<{type: 'success'|'error', text: string} | null>(null);
 
   const showToast = (text: string, type: 'success'|'error' = 'error') => {
@@ -118,6 +120,12 @@ export default function AnonymousReport() {
       return;
     }
 
+    setLoading(true);
+    setWakingServer(false);
+    const timeout = setTimeout(() => {
+      setWakingServer(true);
+    }, 4000);
+
     try {
       const formData = new FormData();
       // Anonymous reports default to 0,0 since we are removing strict coordinates
@@ -136,6 +144,10 @@ export default function AnonymousReport() {
     } catch (error: any) {
       console.error(error);
       showToast(`Failed to submit report: ${error.message}`);
+    } finally {
+      clearTimeout(timeout);
+      setWakingServer(false);
+      setLoading(false);
     }
   };
 
@@ -276,8 +288,8 @@ export default function AnonymousReport() {
             onChange={(e) => setContactInfo(e.target.value)} 
           />
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1.5rem', padding: '15px', backgroundColor: '#95a5a6', boxShadow: 'none' }} disabled={!isLocationConfirmed}>
-            {t('submit')}
+          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1.5rem', padding: '15px', backgroundColor: '#95a5a6', boxShadow: 'none' }} disabled={!isLocationConfirmed || loading}>
+            {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : t('submit')}
           </button>
           {!isLocationConfirmed && <p style={{ color: 'var(--error)', fontSize: '0.9rem', textAlign: 'center', marginTop: '10px' }}>Please confirm the incident location on the map.</p>}
         </form>

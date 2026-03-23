@@ -33,12 +33,19 @@ export default function UserPortal() {
   const [newPassword, setNewPassword] = useState('');
   
   const [loading, setLoading] = useState(false);
+  const [wakingServer, setWakingServer] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   const handleRecoveryReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setErrorMsg(''); setSuccessMsg('');
+    setWakingServer(false);
+    
+    const timeout = setTimeout(() => {
+      setWakingServer(true);
+    }, 4000);
+
     try {
       const data = await request('/auth/reset-password/', { 
         method: 'POST', 
@@ -57,13 +64,22 @@ export default function UserPortal() {
       }, 1500);
     } catch (err: any) {
       setErrorMsg(err.message || 'Recovery failed. Check your code or credentials.');
-    } finally { setLoading(false); }
+    } finally { 
+      clearTimeout(timeout);
+      setWakingServer(false);
+      setLoading(false); 
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
+    setWakingServer(false);
+    
+    const timeout = setTimeout(() => {
+      setWakingServer(true);
+    }, 4000);
 
     try {
       if (isLogin) {
@@ -99,6 +115,8 @@ export default function UserPortal() {
       console.error(err);
       setErrorMsg(err.message || 'Authentication failed. Check your credentials.');
     } finally {
+      clearTimeout(timeout);
+      setWakingServer(false);
       setLoading(false);
     }
   };
@@ -124,7 +142,7 @@ export default function UserPortal() {
               <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-                {loading ? 'Processing...' : 'Recover Account & Login'}
+                {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Recover Account & Login'}
               </button>
             </form>
             <p style={{ textAlign: 'center', marginTop: '1.5rem', cursor: 'pointer', color: 'var(--text-muted)' }} onClick={() => { setIsForgotPassword(false); setErrorMsg(''); setSuccessMsg(''); }}>
@@ -141,7 +159,7 @@ export default function UserPortal() {
             </p>
             
             <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-              {loading ? 'Processing...' : 'Login'}
+              {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Login'}
             </button>
           </form>
         ) : (
@@ -156,7 +174,7 @@ export default function UserPortal() {
             <input type="password" placeholder={t('confirm_password')} required autoComplete="new-password" />
             
             <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-              {loading ? 'Processing...' : 'Register'}
+              {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Register'}
             </button>
           </form>
         )}

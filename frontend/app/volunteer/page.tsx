@@ -35,6 +35,7 @@ export default function VolunteerPortal() {
   const [successMsg, setSuccessMsg] = useState('');
   const [approvedData, setApprovedData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [wakingServer, setWakingServer] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const [identifier, setIdentifier] = useState('');
@@ -44,6 +45,12 @@ export default function VolunteerPortal() {
   const handleRecoveryReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setErrorMsg(''); setSuccessMsg('');
+    setWakingServer(false);
+    
+    const timeout = setTimeout(() => {
+      setWakingServer(true);
+    }, 4000);
+
     try {
       const data = await request('/auth/reset-password/', { 
         method: 'POST', 
@@ -62,7 +69,11 @@ export default function VolunteerPortal() {
       }, 1500);
     } catch (err: any) {
       setErrorMsg(err.message || 'Recovery failed. Check your code or credentials.');
-    } finally { setLoading(false); }
+    } finally { 
+      clearTimeout(timeout);
+      setWakingServer(false);
+      setLoading(false); 
+    }
   };
 
   // Auto-redirect valid sessions to dashboard
@@ -80,6 +91,11 @@ export default function VolunteerPortal() {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
+    setWakingServer(false);
+    
+    const timeout = setTimeout(() => {
+      setWakingServer(true);
+    }, 4000);
 
     try {
       if (mode === 'status') {
@@ -131,6 +147,8 @@ export default function VolunteerPortal() {
       console.error(err);
       setErrorMsg(err.message || 'Authentication failed. Check your details.');
     } finally {
+      clearTimeout(timeout);
+      setWakingServer(false);
       setLoading(false);
     }
   };
@@ -236,14 +254,14 @@ export default function VolunteerPortal() {
             </div>
 
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Submit Application'}
+              {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Submit Application'}
             </button>
           </form>
         ) : mode === 'status' ? (
           <form onSubmit={handleSubmit} autoComplete="off">
             <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="off" />
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Check Status'}
+              {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Check Status'}
             </button>
           </form>
         ) : mode === 'forgot' ? (
@@ -254,7 +272,7 @@ export default function VolunteerPortal() {
               <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               
               <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
-                {loading ? 'Processing...' : 'Recover Account & Login'}
+                {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Recover Account & Login'}
               </button>
             </form>
           </div>
@@ -268,7 +286,7 @@ export default function VolunteerPortal() {
             </p>
 
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Login'}
+              {wakingServer ? 'Waking backend... (~50s)' : loading ? 'Processing...' : 'Login'}
             </button>
           </form>
         )}
