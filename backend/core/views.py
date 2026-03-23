@@ -241,12 +241,15 @@ class ReportViewSet(viewsets.ModelViewSet):
                 print(f"To: {recipient}\n{message_body}\n------------------------------")
                 
                 if '@' in recipient:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    try:
-                        send_mail('HelpHub - Report Status Update', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
-                    except Exception as e:
-                        print(f"Failed to send email: {e}")
+                    import threading
+                    def send_async_email():
+                        from django.core.mail import send_mail
+                        from django.conf import settings
+                        try:
+                            send_mail('HelpHub - Report Status Update', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
+                        except Exception as e:
+                            print(f"Failed to send email: {e}")
+                    threading.Thread(target=send_async_email).start()
 
     def perform_update(self, serializer):
         old_instance = self.get_object()
@@ -271,12 +274,15 @@ class ReportViewSet(viewsets.ModelViewSet):
                 print(f"To: {recipient}\n{message_body}\n------------------------------")
                 
                 if '@' in recipient:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    try:
-                        send_mail(f'HelpHub - Update on Report #{report.id}', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
-                    except Exception as e:
-                        print(f"Failed to send email: {e}")
+                    import threading
+                    def send_async_update():
+                        from django.core.mail import send_mail
+                        from django.conf import settings
+                        try:
+                            send_mail(f'HelpHub - Update on Report #{report.id}', message_body, settings.EMAIL_HOST_USER or 'noreply@helphub.com', [recipient], fail_silently=True)
+                        except Exception as e:
+                            print(f"Failed to send email: {e}")
+                    threading.Thread(target=send_async_update).start()
                 
 
 class VolunteerProfileViewSet(viewsets.ModelViewSet):
