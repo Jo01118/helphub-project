@@ -310,6 +310,9 @@ export default function AdminDashboard() {
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-main)' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--primary)' }}>🏛️ Admin Control Center</h1>
+        <button onClick={fetchAdminData} style={{ padding: '8px 16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+          🔄 Refresh Data
+        </button>
       </header>
 
       {/* Tabs removed for global hamburger nav */}
