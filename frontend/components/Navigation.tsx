@@ -15,6 +15,10 @@ export default function Navigation() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Preemptively wake up Render Free Tier server silently in the background!
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-ytdv.onrender.com/api'}/reports/`)
+        .catch(() => {}); // ignore errors silently
+
       // Register Service Worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
