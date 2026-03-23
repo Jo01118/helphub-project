@@ -549,7 +549,7 @@ export default function UserDashboard() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       {userData.recovery_codes && userData.recovery_codes.length > 0 ? (
                         userData.recovery_codes.map((code: string, idx: number) => (
-                          <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary)' }}>
+                          <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px 5px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1rem', fontWeight: 'bold', letterSpacing: '1px', color: 'var(--primary)', wordBreak: 'break-all' }}>
                             {code}
                           </div>
                         ))
@@ -562,7 +562,7 @@ export default function UserDashboard() {
                   ) : (
                     <div style={{ filter: 'blur(5px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', userSelect: 'none', pointerEvents: 'none' }}>
                       {[1, 2, 3, 4].map(idx => (
-                        <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--text-muted)' }}>
+                        <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px 5px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1rem', fontWeight: 'bold', letterSpacing: '1px', color: 'var(--text-muted)', wordBreak: 'break-all' }}>
                           ••••••••
                         </div>
                       ))}
