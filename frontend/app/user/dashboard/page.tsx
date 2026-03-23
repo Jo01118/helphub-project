@@ -13,6 +13,7 @@ export default function UserDashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState({ type: '', text: '' });
+  const [showRecoveryCodes, setShowRecoveryCodes] = useState(false);
   
   // Geolocation
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
@@ -525,6 +526,46 @@ export default function UserDashboard() {
                     {profileLoading ? 'Saving Changes...' : 'Save Profile Details'}
                   </button>
                 </form>
+
+                <div style={{ marginTop: '2rem', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                  <h3 style={{ marginBottom: '10px', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    Account Recovery Codes
+                    <button 
+                      onClick={() => setShowRecoveryCodes(!showRecoveryCodes)}
+                      style={{ fontSize: '0.9rem', padding: '5px 10px', backgroundColor: 'var(--secondary)', color: 'black', borderRadius: '4px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      {showRecoveryCodes ? 'Hide' : 'Reveal'}
+                    </button>
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '15px' }}>
+                    Save these 4 unique codes somewhere safe. If you forget your password, you can use ONE of these codes to log back into your account. Each code can only be used once.
+                  </p>
+                  
+                  {showRecoveryCodes ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      {userData.recovery_codes && userData.recovery_codes.length > 0 ? (
+                        userData.recovery_codes.map((code: string, idx: number) => (
+                          <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--primary)' }}>
+                            {code}
+                          </div>
+                        ))
+                      ) : (
+                        <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'var(--error)' }}>
+                          No active recovery codes available. Please contact support.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ filter: 'blur(5px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', userSelect: 'none', pointerEvents: 'none' }}>
+                      {[1, 2, 3, 4].map(idx => (
+                        <div key={idx} style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '10px', borderRadius: '6px', textAlign: 'center', fontFamily: 'monospace', fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--text-muted)' }}>
+                          ••••••••
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
             

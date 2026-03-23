@@ -37,51 +37,31 @@ export default function VolunteerPortal() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [identifier, setIdentifier] = useState('');
-  const [otpCode, setOtpCode] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
-  const handleRequestOtp = async (e: React.FormEvent) => {
+  const handleRecoveryReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setErrorMsg(''); setSuccessMsg('');
     try {
-      const data = await request('/auth/request-otp/', { method: 'POST', body: JSON.stringify({ identifier }) });
-      setIsOtpSent(true);
-      setSuccessMsg('OTP sent! Please check your email or phone.');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Error sending OTP. Make sure your email/phone is registered.');
-    } finally { setLoading(false); }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); setErrorMsg(''); setSuccessMsg('');
-    try {
-      const data = await request('/auth/verify-otp/', { method: 'POST', body: JSON.stringify({ identifier, code: otpCode }) });
-      localStorage.setItem('access', data.reset_token);
-      setIsOtpVerified(true);
-      setSuccessMsg('OTP Verified. You can now reset your password.');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Invalid OTP.');
-    } finally { setLoading(false); }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); setErrorMsg(''); setSuccessMsg('');
-    try {
-      await request('/auth/reset-password/', { method: 'POST', body: JSON.stringify({ new_password: newPassword }) });
-      setSuccessMsg('Password reset successfully. Please login.');
+      const data = await request('/auth/reset-password/', { 
+        method: 'POST', 
+        body: JSON.stringify({ 
+          identifier, 
+          recovery_code: recoveryCode, 
+          new_password: newPassword 
+        }) 
+      });
+      localStorage.setItem('access', data.access);
+      if (data.refresh) localStorage.setItem('refresh', data.refresh);
+      localStorage.setItem('userRole', 'VOLUNTEER');
+      setSuccessMsg('Account recovered successfully. Redirecting...');
       setTimeout(() => {
-        setMode('login');
-        setIsOtpSent(false);
-        setIsOtpVerified(false);
-        setSuccessMsg('');
-      }, 2000);
+        window.location.href = '/volunteer/dashboard';
+      }, 1500);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error resetting password.');
+      setErrorMsg(err.message || 'Recovery failed. Check your code or credentials.');
     } finally { setLoading(false); }
   };
 
@@ -268,31 +248,15 @@ export default function VolunteerPortal() {
           </form>
         ) : mode === 'forgot' ? (
           <div>
-            {!isOtpSent && !isOtpVerified && (
-              <form onSubmit={handleRequestOtp}>
-                <input type="text" placeholder="Registered Email or Phone" required value={identifier} onChange={e => setIdentifier(e.target.value)} />
-                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
-                  {loading ? 'Processing...' : 'Send OTP'}
-                </button>
-              </form>
-            )}
-            {isOtpSent && !isOtpVerified && (
-              <form onSubmit={handleVerifyOtp}>
-                <input type="text" placeholder="Enter 6-digit OTP" required value={otpCode} onChange={e => setOtpCode(e.target.value)} />
-                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
-                  {loading ? 'Processing...' : 'Verify OTP'}
-                </button>
-              </form>
-            )}
-            {isOtpVerified && (
-              <form onSubmit={handleResetPassword}>
-                <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
-                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
-                  {loading ? 'Processing...' : 'Reset Password'}
-                </button>
-              </form>
-            )}
-
+            <form onSubmit={handleRecoveryReset}>
+              <input type="text" placeholder="Username, Email or Phone" required value={identifier} onChange={e => setIdentifier(e.target.value)} />
+              <input type="text" placeholder="Enter 1 Recovery Code" required value={recoveryCode} onChange={e => setRecoveryCode(e.target.value)} />
+              <input type="password" placeholder="New Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+              
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}>
+                {loading ? 'Processing...' : 'Recover Account & Login'}
+              </button>
+            </form>
           </div>
         ) : (
           <form onSubmit={handleSubmit} autoComplete="off">
