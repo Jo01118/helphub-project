@@ -12,6 +12,15 @@ class User(AbstractUser):
     city = models.CharField(max_length=100, blank=True, null=True)
     age = models.IntegerField(null=True, blank=True)
 
+class RecoveryCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recovery_codes')
+    code = models.CharField(max_length=30, unique=True, db_index=True)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Recovery Code for {self.user.username}"
+
 class VolunteerProfile(models.Model):
     STATUS_CHOICES = (
         ('PENDING', 'Pending'),

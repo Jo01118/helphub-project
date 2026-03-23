@@ -2,7 +2,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, VolunteerProfile, Report, AssignmentRequest
+from .models import User, VolunteerProfile, Report, AssignmentRequest, RecoveryCode
 from .serializers import UserSerializer, VolunteerProfileSerializer, ReportSerializer, AssignmentRequestSerializer
 from rest_framework.decorators import action
 
@@ -38,6 +38,15 @@ def register_user(request):
     serializer = UserSerializer(data=data)
     if serializer.is_valid():
         user = serializer.save()
+        
+        import string
+        import random
+        for _ in range(4):
+            code_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            while RecoveryCode.objects.filter(code=code_str).exists():
+                code_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            RecoveryCode.objects.create(user=user, code=code_str)
+
         if is_volunteer:
             vp = VolunteerProfile.objects.create(user=user)
             resume_file = request.FILES.get('resume')
@@ -134,90 +143,38 @@ import random
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
-def request_otp(request):
-    identifier = request.data.get('identifier') # email or phone
-    if not identifier:
-        return Response({"error": "Email or phone number required."}, status=400)
-    
-    from django.db import models
-    # Try finding user by email or phone. Excluding admin.
-    user = User.objects.filter(models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
-    if not user:
-        return Response({"error": "Not found. Please enter the correct credentials."}, status=404)
-        
-    # Generate 6-digit OTP
-    code = f"{random.randint(100000, 999999)}"
-    from .models import OTPCode
-    OTPCode.objects.create(user=user, code=code)
-    
-    # Send Actual Email if identifier looks like an email
-    if '@' in identifier:
-        from django.core.mail import send_mail
-        from django.conf import settings
-        try:
-            send_mail(
-                'HelpHub - Password Reset OTP',
-                f'Your HelpHub Password Reset OTP code is: {code}\nPlease do not share this with anyone.',
-                settings.EMAIL_HOST_USER or 'noreply@helphub.com',
-                [identifier],
-                fail_silently=False,
-            )
-        except Exception as e:
-            print(f"Failed to send real email: {e}")
-            return Response({"error": f"Email gateway failed snippet: {str(e)}. Please assure your Render Environment Variables (EMAIL_HOST_USER & EMAIL_HOST_PASSWORD) are correctly set."}, status=500)
-    
-    # Simulate sending email/SMS in console for debugging and fallback
-    print(f"--- SIMULATED NOTIFICATION / DEBUG ---")
-    print(f"To: {identifier}")
-    print(f"OTP for HelpHub Password Reset: {code}")
-    print(f"--------------------------------------")
-    
-    return Response({"message": "OTP sent successfully."})
-
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
-def verify_otp(request):
-    identifier = request.data.get('identifier')
-    code = request.data.get('code')
-    
-    if not identifier or not code:
-        return Response({"error": "Identifier and code required."}, status=400)
-        
-    from django.db import models
-    user = User.objects.filter(models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
-    if not user:
-        return Response({"error": "User not found."}, status=404)
-        
-    from .models import OTPCode
-    otp = OTPCode.objects.filter(user=user, code=code, is_used=False).order_by('-created_at').first()
-    
-    if not otp or not otp.is_valid():
-        return Response({"error": "Invalid or expired OTP."}, status=400)
-        
-    otp.is_used = True
-    otp.save()
-    
-    refresh_token, access_token = get_tokens_for_user(user)
-    return Response({
-        "message": "OTP verified successfully.",
-        "reset_token": access_token
-    })
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
 def reset_password(request):
+    identifier = request.data.get('identifier')
+    recovery_code = request.data.get('recovery_code')
     new_password = request.data.get('new_password')
-    if not new_password:
-        return Response({"error": "New password required."}, status=400)
+    
+    if not identifier or not recovery_code or not new_password:
+        return Response({"error": "Identifier, recovery code, and new password are all required."}, status=400)
         
-    user = request.user
-    if user.role == 'ADMIN':
-        return Response({"error": "Admins cannot reset password through this flow."}, status=403)
+    from django.db import models
+    # Try finding user by email, exactly matched username, or phone. Excluding admin.
+    user = User.objects.filter(models.Q(username=identifier) | models.Q(email=identifier) | models.Q(phone=identifier)).exclude(role='ADMIN').first()
+    if not user:
+        return Response({"error": "Account not found."}, status=404)
         
+    code_obj = RecoveryCode.objects.filter(user=user, code=recovery_code, is_used=False).first()
+    
+    if not code_obj:
+        return Response({"error": "Invalid or expired recovery code."}, status=400)
+        
+    code_obj.is_used = True
+    code_obj.save()
+    
     user.set_password(new_password)
     user.save()
     
-    return Response({"message": "Password reset successfully."})
+    refresh_token, access_token = get_tokens_for_user(user)
+    return Response({
+        "message": "Password reset successfully using Recovery Code.",
+        "access": access_token,
+        "refresh": refresh_token,
+        "user": UserSerializer(user).data
+    })
 
 class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer

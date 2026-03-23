@@ -25,11 +25,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 class UserSerializer(serializers.ModelSerializer):
+    recovery_codes = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'email', 'role', 'phone', 'city', 'age', 'password']
+        fields = ['id', 'username', 'first_name', 'email', 'role', 'phone', 'city', 'age', 'password', 'recovery_codes']
         extra_kwargs = {'password': {'write_only': True}}
         
+    def get_recovery_codes(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated and request.user == obj:
+            return list(obj.recovery_codes.filter(is_used=False).values_list('code', flat=True))
+        return []
+
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
