@@ -49,7 +49,7 @@ Do not provide formatting that cannot be rendered in plain text (avoid markdown 
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     return NextResponse.json(
-      { text: "I'm sorry, I'm experiencing technical difficulties connecting to my AI processor. Please try again later or contact helphubreporting.team@gmail.com." },
+      { text: `System Error: ${error.message || 'Unknown Error'}. Please ensure your API key is valid and the server was restarted.` },
       { status: 500 }
     );
   }
