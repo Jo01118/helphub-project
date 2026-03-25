@@ -33,69 +33,9 @@ export default function HelpChat() {
     scrollToBottom();
   }, [messages]);
 
-  const generateBotResponse = (userInput: string): string => {
-    const text = userInput.toLowerCase();
+  // Hardcoded responses removed in favor of real AI.
 
-    // Conversational Pleasantries
-    if (text === 'hi' || text === 'hello' || text === 'hey' || text.includes('good morning') || text.includes('good afternoon')) {
-      return "Hello there! 👋 How can I assist you with HelpHub today? You can ask me things like how to report an issue or change your profile.";
-    }
-
-    if (text.includes('thank you') || text.includes('thanks') || text === 'ok' || text === 'cool') {
-      return "You're very welcome! Let me know if you need help with anything else. 😊";
-    }
-
-    // Keyword Detection
-    if (text.includes('upload') && (text.includes('image') || text.includes('photo') || text.includes('picture'))) {
-      return "To upload an image, click on the 'Upload Photo' button in the report form. Make sure the file format is a standard image like JPEG or PNG, and the file size isn't too large.";
-    }
-
-    if (text.includes('location') || text.includes('map') || text.includes('gps')) {
-      return "If your live location isn't working, please ensure you've given location permissions to your browser. Alternatively, you can use the search bar in the report form to manually type your city or area, and confirm it on the map.";
-    }
-
-    if (text.includes('how to report') || text.includes('create report') || text.includes('submit issue')) {
-      return "To report an issue, navigate to the Home page or User Dashboard and click 'Report an Issue'. Fill in the Category, select the Issue type, confirm your location on the map, provide a description, and finally click Submit.";
-    }
-    
-    if (text.includes('anonymous')) {
-      return "Yes, you can report an issue anonymously! Just go to the Home page and select 'Anonymous Report'. We won't require you to log in or leave your details, unless you want updates.";
-    }
-
-    if (text.includes('volunteer') || text.includes('help out')) {
-      return "To become a volunteer, click 'Login / Register' from the menu and choose the 'Volunteer' registration option. Once approved, you can attend to nearby issues.";
-    }
-
-    if (text.includes('password') || text.includes('login') || text.includes('account')) {
-      return "Having trouble logging in? You can use one of your generated Account Recovery Codes to log in if you forget your password. Look for them in your Profile section once you successfully log in.";
-    }
-    
-    if (text.includes('change name') || text.includes('profile') || text.includes('edit details') || text.includes('update name') || text.includes('username') || text.includes('phone') || text.includes('email')) {
-      return "To change your name or other personal details, navigate to the 'My Profile' tab in your Dashboard. Make your desired changes there and click 'Save Profile Details'.";
-    }
-
-    if (text.includes('admin') || text.includes('contact') || text.includes('support team') || text.includes('help desk') || text.includes('email') || text.includes('owner') || text.includes('volunteer')) {
-      return "If you need to contact the admin, owners, or volunteers directly, please send an email to: helphubreporting.team@gmail.com";
-    }
-
-    if (text.includes('solve') || text.includes('how many days') || text.includes('time') || text.includes('when') || text.includes('resolve') || text.includes('take')) {
-      return "Once you submit a report, it is routed to nearby volunteers and our administration team. Resolution times vary by issue severity and volunteer availability, but most standard issues are typically addressed within 2 to 4 business days. You can track your report's status in the 'My Reports' tab.";
-    }
-
-    if (text.includes('offline') || text.includes('no internet') || text.includes('without internet')) {
-      return "Yes! HelpHub is designed as a Progressive Web App (PWA). You can install it on your mobile device or computer to access it easily. Please note that while the app itself can be opened offline, you will need an active internet connection to submit new reports or receive live updates.";
-    }
-
-    // Broad generic application fallback
-    if (text.includes('app') || text.includes('issue') || text.includes('report') || text.includes('helphub') || text.includes('system') || text.includes('platform') || text.includes('error') || text.includes('bug')) {
-       return "For any general application queries or issues regarding HelpHub, make sure you are logged in. You can explore the user dashboard to see your active reports. If the system is not working as expected, feel free to try reloading the page, or checking your geolocation permissions.";
-    }
-
-    // Default fallback (Out of scope)
-    return "I'm sorry, I cannot answer queries that are not related to the HelpHub application. To contact the owners, admin, or volunteers regarding any other matter, please send an email to helphubreporting.team@gmail.com";
-  };
-
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
@@ -110,19 +50,39 @@ export default function HelpChat() {
     setInputText('');
     setIsTyping(true);
 
-    // Simulate thinking delay between 2-5 secs
-    const delay = Math.floor(Math.random() * 3000) + 2000;
-    setTimeout(() => {
-      const responseText = generateBotResponse(userMsg.text);
+    try {
+      // Call the new real AI Gemini endpoint
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: userMsg.text,
+          // Pass context of the conversation so the model has memory (excluding the first system greeting)
+          history: messages.length > 1 ? messages.slice(1) : []
+        })
+      });
+      
+      const data = await res.json();
+      
       const botMsg: Message = {
         id: Date.now() + 1,
-        text: responseText,
+        text: data.text || "I didn't receive a response from the server.",
         sender: 'bot',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMsg]);
+    } catch (error) {
+      console.error("Chat API error:", error);
+      const botMsg: Message = {
+        id: Date.now() + 1,
+        text: "Sorry, I am having trouble connecting to my central brain. Please check your internet connection.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMsg]);
+    } finally {
       setIsTyping(false);
-    }, delay);
+    }
   };
 
   return (
