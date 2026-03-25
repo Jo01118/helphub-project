@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Navigation from '../../components/Navigation';
 
 interface Message {
@@ -21,6 +22,7 @@ export default function HelpChat() {
   ]);
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -56,6 +58,10 @@ export default function HelpChat() {
 
     if (text.includes('password') || text.includes('login') || text.includes('account')) {
       return "Having trouble logging in? You can use one of your generated Account Recovery Codes to log in if you forget your password. Look for them in your Profile section once you successfully log in.";
+    }
+    
+    if (text.includes('change name') || text.includes('profile') || text.includes('edit details') || text.includes('update name') || text.includes('username') || text.includes('phone') || text.includes('email')) {
+      return "To change your name or other personal details, navigate to the 'My Profile' tab in your Dashboard. Make your desired changes there and click 'Save Profile Details'.";
     }
 
     // Default fallback
@@ -96,7 +102,14 @@ export default function HelpChat() {
       <div style={{ flex: 1, padding: '2rem', display: 'flex', justifyContent: 'center', marginTop: '60px' }}>
         <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)', padding: 0, overflow: 'hidden' }}>
           
-          <div style={{ backgroundColor: 'var(--surface)', padding: '1.5rem', borderBottom: '1px solid var(--border)', textAlign: 'center' }}>
+          <div style={{ backgroundColor: 'var(--surface)', padding: '1.5rem', borderBottom: '1px solid var(--border)', textAlign: 'center', position: 'relative' }}>
+            <button 
+              onClick={() => router.back()} 
+              style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', background: 'var(--primary)', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px 15px', borderRadius: '8px', fontWeight: 'bold' }}
+              title="Exit Chat"
+            >
+              ⬅️ Exit
+            </button>
             <h2 style={{ color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
               🤖 HelpHub Assistant
             </h2>
