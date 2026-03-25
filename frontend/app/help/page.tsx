@@ -64,6 +64,14 @@ export default function HelpChat() {
       return "To change your name or other personal details, navigate to the 'My Profile' tab in your Dashboard. Make your desired changes there and click 'Save Profile Details'.";
     }
 
+    if (text.includes('admin') || text.includes('contact') || text.includes('support team') || text.includes('help desk') || text.includes('email')) {
+      return "If you need to contact the admin directly, please send an email to: helphubreporting.team@gmail.com";
+    }
+
+    if (text.includes('solve') || text.includes('how many days') || text.includes('time') || text.includes('when') || text.includes('resolve') || text.includes('take')) {
+      return "Once you submit a report, it is routed to nearby volunteers and our administration team. Resolution times vary by issue severity and volunteer availability, but most standard issues are typically addressed within 2 to 4 business days. You can track your report's status in the 'My Reports' tab.";
+    }
+
     // Default fallback
     return "I'm sorry, I don't fully understand your query. Could you try rephrasing? Popular topics include 'location', 'image upload', and 'how to report'.";
   };
