@@ -81,6 +81,7 @@ export default function Navigation() {
   let navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Login / Register', href: '/access' },
+    { name: 'Help / Chat', href: '/help' },
     { name: 'Anonymous Report', href: '/anonymous' },
   ];
 
@@ -90,6 +91,7 @@ export default function Navigation() {
       { name: 'Report an Issue', href: '#report' },
       { name: 'My Reports', href: '#my_reports' },
       { name: 'My Profile', href: '#profile' },
+      { name: 'Help / Chat', href: '/help' },
       { name: '🚨 Emergency Call', href: 'tel:112' },
       { name: 'Logout', href: '#logout' }
     ];

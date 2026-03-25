@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { requestFormData } from '../utils/api';
 import { searchLocationCoords } from '../utils/geocoding';
+import { getIssueSuggestions } from '../utils/aiSuggestions';
 
 export default function AnonymousReport() {
   const { t } = useLanguage();
@@ -24,6 +25,20 @@ export default function AnonymousReport() {
   const recognitionRef = useRef<any>(null);
 
   // Form Fields
+  const [category, setCategory] = useState('');
+  const [issueType, setIssueType] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setCategory(val);
+    if (val.trim()) {
+      setSuggestions(getIssueSuggestions(val));
+    } else {
+      setSuggestions([]);
+    }
+  };
+
   const [photo, setPhoto] = useState<File | null>(null);
   const [manualText, setManualText] = useState('');
   const [contactInfo, setContactInfo] = useState('');
@@ -127,9 +142,9 @@ export default function AnonymousReport() {
       formData.append('latitude', location.lat.toString());
       formData.append('longitude', location.lng.toString());
       
-      const combinedText = `[Voice]: ${voiceText}\n\n[Text]: ${manualText}\n[Location Info]: ${locName}`;
+      const combinedText = `[Category]: ${category || 'General'}\n[Issue]: ${issueType || 'Not specified'}\n[Voice]: ${voiceText}\n\n[Text]: ${manualText}\n[Location Info]: ${locName}`;
       formData.append('text', combinedText);
-      formData.append('language', 'en'); 
+      formData.append('language', 'en');
 
       if (photo) formData.append('photo', photo);
       if (contactInfo) formData.append('contact_info', contactInfo);
@@ -240,8 +255,51 @@ export default function AnonymousReport() {
         </div>
 
         <form onSubmit={handleSubmitReport}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>📸 Upload Photo</label>
-          <input type="file" accept="image/*" onChange={(e) => e.target.files && setPhoto(e.target.files[0])} />
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>🏷️ Category</label>
+          <input 
+            type="text" 
+            value={category} 
+            onChange={handleCategoryChange} 
+            placeholder="e.g. Animal Issue, Road, Waste..."
+            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '10px' }}
+          />
+
+          {suggestions.length > 0 && (
+            <div style={{ marginBottom: '1rem', padding: '10px', backgroundColor: 'var(--surface)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>✨ Smart Suggestions (Click to select):</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {suggestions.map((sug, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setIssueType(sug)}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: issueType === sug ? 'var(--primary)' : 'rgba(56, 189, 248, 0.1)',
+                      color: issueType === sug ? '#fff' : 'var(--primary)',
+                      border: '1px solid var(--primary)',
+                      borderRadius: '20px',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {issueType && (
+            <div style={{ marginBottom: '1rem', color: 'var(--success)', fontWeight: 'bold' }}>
+              Selected Issue: {issueType}
+            </div>
+          )}
+
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>📸 Upload Photo</label>
+          <input type="file" accept="image/*" onChange={(e) => e.target.files && setPhoto(e.target.files[0])} style={{ marginBottom: '1rem' }} />
 
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>🎤 Voice Input</label>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', alignItems: 'center' }}>

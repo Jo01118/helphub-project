@@ -1,0 +1,165 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import Navigation from '../../components/Navigation';
+
+interface Message {
+  id: number;
+  text: string;
+  sender: 'bot' | 'user';
+  timestamp: Date;
+}
+
+export default function HelpChat() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      text: "Hello! I am HelpHub's automated assistant. You can ask me questions like 'I can't upload image', 'location not working', or 'how to report issue'. How can I help you today?",
+      sender: 'bot',
+      timestamp: new Date()
+    }
+  ]);
+  const [inputText, setInputText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const generateBotResponse = (userInput: string): string => {
+    const text = userInput.toLowerCase();
+
+    // Keyword Detection
+    if (text.includes('upload') && (text.includes('image') || text.includes('photo') || text.includes('picture'))) {
+      return "To upload an image, click on the 'Upload Photo' button in the report form. Make sure the file format is a standard image like JPEG or PNG, and the file size isn't too large.";
+    }
+
+    if (text.includes('location') || text.includes('map') || text.includes('gps')) {
+      return "If your live location isn't working, please ensure you've given location permissions to your browser. Alternatively, you can use the search bar in the report form to manually type your city or area, and confirm it on the map.";
+    }
+
+    if (text.includes('how to report') || text.includes('create report') || text.includes('submit issue')) {
+      return "To report an issue, navigate to the Home page or User Dashboard and click 'Report an Issue'. Fill in the Category, select the Issue type, confirm your location on the map, provide a description, and finally click Submit.";
+    }
+    
+    if (text.includes('anonymous')) {
+      return "Yes, you can report an issue anonymously! Just go to the Home page and select 'Anonymous Report'. We won't require you to log in or leave your details, unless you want updates.";
+    }
+
+    if (text.includes('volunteer') || text.includes('help out')) {
+      return "To become a volunteer, click 'Login / Register' from the menu and choose the 'Volunteer' registration option. Once approved, you can attend to nearby issues.";
+    }
+
+    if (text.includes('password') || text.includes('login') || text.includes('account')) {
+      return "Having trouble logging in? You can use one of your generated Account Recovery Codes to log in if you forget your password. Look for them in your Profile section once you successfully log in.";
+    }
+
+    // Default fallback
+    return "I'm sorry, I don't fully understand your query. Could you try rephrasing? Popular topics include 'location', 'image upload', and 'how to report'.";
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim()) return;
+
+    const userMsg: Message = {
+      id: Date.now(),
+      text: inputText,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setInputText('');
+
+    // Simulate typing delay
+    setTimeout(() => {
+      const responseText = generateBotResponse(userMsg.text);
+      const botMsg: Message = {
+        id: Date.now() + 1,
+        text: responseText,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMsg]);
+    }, 600);
+  };
+
+  return (
+    <main style={{ minHeight: '100vh', backgroundColor: 'var(--background)', display: 'flex', flexDirection: 'column' }}>
+      <Navigation />
+      
+      <div style={{ flex: 1, padding: '2rem', display: 'flex', justifyContent: 'center', marginTop: '60px' }}>
+        <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)', padding: 0, overflow: 'hidden' }}>
+          
+          <div style={{ backgroundColor: 'var(--surface)', padding: '1.5rem', borderBottom: '1px solid var(--border)', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              🤖 HelpHub Assistant
+            </h2>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Chat with our AI bot to get help with common issues.</p>
+          </div>
+
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {messages.map((msg) => (
+              <div key={msg.id} style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                width: '100%'
+              }}>
+                <div style={{
+                  maxWidth: '75%',
+                  padding: '12px 16px',
+                  borderRadius: msg.sender === 'user' ? '16px 16px 0 16px' : '16px 16px 16px 0',
+                  backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
+                  border: msg.sender === 'bot' ? '1px solid var(--border)' : 'none',
+                  color: msg.sender === 'user' ? '#fff' : 'var(--text-main)',
+                  lineHeight: '1.5'
+                }}>
+                  {msg.text}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '5px', padding: '0 5px' }}>
+                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <div style={{ padding: '1rem', borderTop: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+            <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Type your question here (e.g. 'I can't upload image')..."
+                style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+              />
+              <button
+                type="submit"
+                style={{
+                  padding: '0 25px',
+                  backgroundColor: 'var(--primary)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '30px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  transition: 'background-color 0.2s'
+                }}
+                disabled={!inputText.trim()}
+              >
+                Send
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  );
+}
