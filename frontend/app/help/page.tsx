@@ -21,6 +21,7 @@ export default function HelpChat() {
     }
   ]);
   const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -98,8 +99,10 @@ export default function HelpChat() {
 
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
+    setIsTyping(true);
 
-    // Simulate typing delay
+    // Simulate thinking delay between 2-5 secs
+    const delay = Math.floor(Math.random() * 3000) + 2000;
     setTimeout(() => {
       const responseText = generateBotResponse(userMsg.text);
       const botMsg: Message = {
@@ -109,7 +112,8 @@ export default function HelpChat() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMsg]);
-    }, 600);
+      setIsTyping(false);
+    }, delay);
   };
 
   return (
@@ -157,6 +161,19 @@ export default function HelpChat() {
                 </span>
               </div>
             ))}
+            
+            {isTyping && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+                <div style={{ maxWidth: '75%', padding: '12px 16px', borderRadius: '16px 16px 16px 0', backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                  <span style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}>
+                    <span className="typing-dot" style={{ animationDelay: '0ms' }}>.</span>
+                    <span className="typing-dot" style={{ animationDelay: '200ms' }}>.</span>
+                    <span className="typing-dot" style={{ animationDelay: '400ms' }}>.</span>
+                  </span>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
 
@@ -190,6 +207,22 @@ export default function HelpChat() {
 
         </div>
       </div>
+    <style jsx>{`
+        @keyframes slideUp {
+          from { transform: translate(-50%, 150%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        @keyframes blink {
+          0% { opacity: 0.2; }
+          20% { opacity: 1; }
+          100% { opacity: 0.2; }
+        }
+        .typing-dot {
+          animation: blink 1.4s infinite both;
+          font-size: 1.5rem;
+          line-height: 0.5;
+        }
+      `}</style>
     </main>
   );
 }
