@@ -25,14 +25,24 @@ Your goal is to assist users in navigating the app, reporting issues (like potho
 - If they ask out-of-scope, non-app questions, politely decline and provide the admin email: helphubreporting.team@gmail.com.
 Do not provide formatting that cannot be rendered in plain text (avoid markdown if possible, just use standard paragraphs). Keep answers concise and helpful.`;
 
-    // Map history to Gemini's format
-    const formattedHistory = history ? history.map((msg: any) => ({
-      role: msg.sender === 'bot' ? 'model' : 'user',
-      parts: [{ text: msg.text }],
-    })) : [];
+    // Map history to Gemini's format. We push the system prompt as the first invisible interaction 
+    // to ensure compatibility with 'gemini-pro' which is supported in all regions/keys.
+    const formattedHistory = [
+      { role: "user", parts: [{ text: `System Instructions: ${systemPrompt}\n\nAcknowledge these instructions and get ready to assist.` }] },
+      { role: "model", parts: [{ text: "Understood. I am ready to act as the HelpHub assistant." }] }
+    ];
 
-    // Use Gemini 1.5 Flash for fast conversational answers
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+    if (history) {
+      history.forEach((msg: any) => {
+        formattedHistory.push({
+          role: msg.sender === 'bot' ? 'model' : 'user',
+          parts: [{ text: msg.text || " " }],
+        });
+      });
+    }
+
+    // Use gemini-pro for maximum compatibility
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const chat = model.startChat({
       history: formattedHistory,
