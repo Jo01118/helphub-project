@@ -64,16 +64,25 @@ export default function HelpChat() {
       return "To change your name or other personal details, navigate to the 'My Profile' tab in your Dashboard. Make your desired changes there and click 'Save Profile Details'.";
     }
 
-    if (text.includes('admin') || text.includes('contact') || text.includes('support team') || text.includes('help desk') || text.includes('email')) {
-      return "If you need to contact the admin directly, please send an email to: helphubreporting.team@gmail.com";
+    if (text.includes('admin') || text.includes('contact') || text.includes('support team') || text.includes('help desk') || text.includes('email') || text.includes('owner') || text.includes('volunteer')) {
+      return "If you need to contact the admin, owners, or volunteers directly, please send an email to: helphubreporting.team@gmail.com";
     }
 
     if (text.includes('solve') || text.includes('how many days') || text.includes('time') || text.includes('when') || text.includes('resolve') || text.includes('take')) {
       return "Once you submit a report, it is routed to nearby volunteers and our administration team. Resolution times vary by issue severity and volunteer availability, but most standard issues are typically addressed within 2 to 4 business days. You can track your report's status in the 'My Reports' tab.";
     }
 
-    // Default fallback
-    return "I'm sorry, I don't fully understand your query. Could you try rephrasing? Popular topics include 'location', 'image upload', and 'how to report'.";
+    if (text.includes('offline') || text.includes('no internet') || text.includes('without internet')) {
+      return "Yes! HelpHub is designed as a Progressive Web App (PWA). You can install it on your mobile device or computer to access it easily. Please note that while the app itself can be opened offline, you will need an active internet connection to submit new reports or receive live updates.";
+    }
+
+    // Broad generic application fallback
+    if (text.includes('app') || text.includes('issue') || text.includes('report') || text.includes('helphub') || text.includes('system') || text.includes('platform') || text.includes('error') || text.includes('bug')) {
+       return "For any general application queries or issues regarding HelpHub, make sure you are logged in. You can explore the user dashboard to see your active reports. If the system is not working as expected, feel free to try reloading the page, or checking your geolocation permissions.";
+    }
+
+    // Default fallback (Out of scope)
+    return "I'm sorry, I cannot answer queries that are not related to the HelpHub application. To contact the owners, admin, or volunteers regarding any other matter, please send an email to helphubreporting.team@gmail.com";
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
