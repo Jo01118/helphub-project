@@ -36,6 +36,15 @@ export default function HelpChat() {
   const generateBotResponse = (userInput: string): string => {
     const text = userInput.toLowerCase();
 
+    // Conversational Pleasantries
+    if (text === 'hi' || text === 'hello' || text === 'hey' || text.includes('good morning') || text.includes('good afternoon')) {
+      return "Hello there! 👋 How can I assist you with HelpHub today? You can ask me things like how to report an issue or change your profile.";
+    }
+
+    if (text.includes('thank you') || text.includes('thanks') || text === 'ok' || text === 'cool') {
+      return "You're very welcome! Let me know if you need help with anything else. 😊";
+    }
+
     // Keyword Detection
     if (text.includes('upload') && (text.includes('image') || text.includes('photo') || text.includes('picture'))) {
       return "To upload an image, click on the 'Upload Photo' button in the report form. Make sure the file format is a standard image like JPEG or PNG, and the file size isn't too large.";
