@@ -31,8 +31,8 @@ Do not provide formatting that cannot be rendered in plain text (avoid markdown 
       parts: [{ text: msg.text }],
     })) : [];
 
-    // Use Gemini 1.5 Flash for fast conversational answers
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+    // Use Gemini 2.5 Flash as the user's API key is on the newest model tier
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: systemPrompt });
 
     const chat = model.startChat({
       history: formattedHistory,
