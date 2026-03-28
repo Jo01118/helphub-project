@@ -255,46 +255,58 @@ export default function AnonymousReport() {
         </div>
 
         <form onSubmit={handleSubmitReport}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>🏷️ Category</label>
-          <input 
-            type="text" 
-            value={category} 
-            onChange={handleCategoryChange} 
-            placeholder="e.g. Animal Issue, Road, Waste..."
-            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '10px' }}
-          />
+          {!issueType ? (
+            <>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>🏷️ Category</label>
+              <input 
+                type="text" 
+                value={category} 
+                onChange={handleCategoryChange} 
+                placeholder="e.g. Animal Issue, Road, Waste..."
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '10px' }}
+              />
 
-          {suggestions.length > 0 && (
-            <div style={{ marginBottom: '1rem', padding: '10px', backgroundColor: 'var(--surface)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
-              <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>✨ Smart Suggestions (Click to select):</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {suggestions.map((sug, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setIssueType(sug)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: issueType === sug ? 'var(--primary)' : 'rgba(56, 189, 248, 0.1)',
-                      color: issueType === sug ? '#fff' : 'var(--primary)',
-                      border: '1px solid var(--primary)',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {sug}
-                  </button>
-                ))}
+              {suggestions.length > 0 && (
+                <div style={{ marginBottom: '1rem', padding: '10px', backgroundColor: 'var(--surface)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>✨ Smart Suggestions (Click to select):</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {suggestions.map((sug, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setIssueType(sug)}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: issueType === sug ? 'var(--primary)' : 'rgba(56, 189, 248, 0.1)',
+                          color: issueType === sug ? '#fff' : 'var(--primary)',
+                          border: '1px solid var(--primary)',
+                          borderRadius: '20px',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem',
+                          fontWeight: 'bold',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {sug}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ marginBottom: '1.5rem', backgroundColor: 'var(--surface)', padding: '15px', borderRadius: '10px', border: '1px solid var(--success)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Selected Category/Issue</span>
+                <strong style={{ fontSize: '1.1rem', color: 'var(--success)' }}>{issueType}</strong>
               </div>
-            </div>
-          )}
-
-          {issueType && (
-            <div style={{ marginBottom: '1rem', color: 'var(--success)', fontWeight: 'bold' }}>
-              Selected Issue: {issueType}
+              <button 
+                type="button" 
+                onClick={() => { setIssueType(''); setCategory(''); }} 
+                style={{ padding: '6px 12px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+              >
+                🔄 Change
+              </button>
             </div>
           )}
 

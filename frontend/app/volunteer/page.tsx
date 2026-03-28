@@ -181,22 +181,31 @@ export default function VolunteerPortal() {
             <input type="number" placeholder="Age" required value={age} onChange={(e) => setAge(e.target.value)} autoComplete="off" />
             <div style={{ marginBottom: '1rem', textAlign: 'left', backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
               {lat && lng ? (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
-                      📍 Confirmed: {locationCity}
-                    </span>
-                    <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
-                      Coordinates: {parseFloat(lat).toFixed(6)}, {parseFloat(lng).toFixed(6)}
-                    </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
+                        📍 Confirmed: {locationCity}
+                      </span>
+                      <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
+                        Coordinates: {parseFloat(lat).toFixed(6)}, {parseFloat(lng).toFixed(6)}
+                      </span>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => { setLat(''); setLng(''); }} 
+                      style={{ padding: '8px 15px', backgroundColor: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      ✏️ Re-enter location
+                    </button>
                   </div>
-                  <button 
-                    type="button" 
-                    onClick={() => { setLat(''); setLng(''); }} 
-                    style={{ padding: '8px 15px', backgroundColor: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
-                    ✏️ Re-enter location
-                  </button>
+                  
+                  <iframe 
+                    width="100%" 
+                    height="200" 
+                    style={{ border: '2px solid var(--border)', borderRadius: '8px' }} 
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(lng)-0.02}%2C${parseFloat(lat)-0.02}%2C${parseFloat(lng)+0.02}%2C${parseFloat(lat)+0.02}&layer=mapnik&marker=${parseFloat(lat)}%2C${parseFloat(lng)}`}
+                  ></iframe>
                 </div>
               ) : (
                 <>
@@ -250,10 +259,87 @@ export default function VolunteerPortal() {
           </form>
         ) : mode === 'status' ? (
           <form onSubmit={handleSubmit} autoComplete="off">
-            <input type="text" placeholder="Enter Tracking ID (e.g. VOL-XXXX)" required value={volunteerId} onChange={(e) => setVolunteerId(e.target.value)} autoComplete="off" />
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Check Status'}
-            </button>
+            {approvedData ? (
+               <div className="fade-in" style={{ textAlign: 'left' }}>
+                  <p style={{ color: 'var(--text-main)', marginBottom: '1.5rem', padding: '10px', backgroundColor: 'rgba(46, 204, 113, 0.1)', borderRadius: '8px', border: '1px solid var(--success)' }}>
+                    <strong>Account Setup Required:</strong> Please choose a permanent username and password to finalize your volunteer account.
+                  </p>
+                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '5px', color: 'var(--text-muted)' }}>Tracking ID (Permanent Username):</label>
+                  <input 
+                    type="text" 
+                    placeholder="Set New Username" 
+                    required 
+                    value={identifier || volunteerId} 
+                    onChange={(e) => setIdentifier(e.target.value)} 
+                    autoComplete="off"
+                    name="new_volunteer_username"
+                  />
+                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '5px', color: 'var(--text-muted)' }}>Choose Password:</label>
+                  <input 
+                    type="password" 
+                    placeholder="Set New Password" 
+                    required 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    autoComplete="new-password"
+                    name="new_volunteer_password"
+                  />
+                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '5px', color: 'var(--text-muted)' }}>Confirm Password:</label>
+                  <input 
+                    type="password" 
+                    placeholder="Confirm New Password" 
+                    required 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    autoComplete="new-password"
+                    name="confirm_new_volunteer_password"
+                  />
+                  <button 
+                    type="button"
+                    className="btn-primary" 
+                    style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }}
+                    onClick={async () => {
+                       if (!identifier && !volunteerId) return;
+                       if (newPassword !== confirmPassword) {
+                         setErrorMsg("Passwords do not match."); return;
+                       }
+                       setLoading(true);
+                       try {
+                          // Standard setup logic
+                          await request('/auth/update-credentials/', {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${approvedData.access}` },
+                            body: JSON.stringify({ username: identifier || volunteerId, password: newPassword })
+                          });
+                          localStorage.setItem('access', approvedData.access);
+                          if (approvedData.refresh) localStorage.setItem('refresh', approvedData.refresh);
+                          localStorage.setItem('userRole', 'VOLUNTEER');
+                          window.location.href = '/volunteer/dashboard';
+                       } catch (err: any) {
+                          setErrorMsg(err.message || "Failed to set credentials.");
+                       } finally { setLoading(false); }
+                    }}
+                    disabled={loading}
+                  >
+                    {loading ? 'Finalizing...' : 'Set Credentials & Enter Dashboard'}
+                  </button>
+               </div>
+            ) : (
+               <>
+                <input 
+                  type="text" 
+                  placeholder="Enter Tracking ID (e.g. VOL-XXXX)" 
+                  required 
+                  value={volunteerId} 
+                  onChange={(e) => setVolunteerId(e.target.value)} 
+                  autoComplete="off" 
+                  name="tracking_id_input"
+                />
+                <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
+                  {loading ? 'Processing...' : 'Check Status'}
+                </button>
+               </>
+            )}
           </form>
         ) : mode === 'forgot' ? (
           <div>

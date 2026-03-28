@@ -370,12 +370,29 @@ export default function AdminDashboard() {
                     </div>
                     
                     {(() => {
-                      const textParts = report.text ? report.text.split('[Text]:') : ['', ''];
-                      const voicePart = textParts[0].replace('[Voice]:', '').trim();
-                      const manualPart = textParts.length > 1 ? textParts[1].trim() : '';
+                      const textRaw = report.text || '';
+                      const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
+                      const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
+                      const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
+                      const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
 
+                      const category = categoryMatch ? categoryMatch[1].trim() : '';
+                      const issue = issueMatch ? issueMatch[1].trim() : '';
+                      const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
+                      const manualPart = manualMatch ? manualMatch[1].trim() : '';
+                      
                       return (
                         <div style={{ margin: '15px 0' }}>
+                          <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                            <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Category</span>
+                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{category || 'General'}</strong>
+                            </div>
+                            <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--success)' }}>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Issue Type</span>
+                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{issue || 'Not Specified'}</strong>
+                            </div>
+                          </div>
                           {voicePart && (
                             <div style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '5px' }}>
                               <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice Transcript:</strong>
@@ -439,7 +456,7 @@ export default function AdminDashboard() {
                       </div>
                     )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: 'auto' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
                       {report.assigned_volunteer_details ? (
                         <div style={{ flex: 1, padding: '10px', backgroundColor: 'var(--success)', color: 'white', borderRadius: '5px', textAlign: 'center', fontWeight: 'bold' }}>
                           👨‍🔧 Assigned to: {report.assigned_volunteer_details.first_name || report.assigned_volunteer_details.username}

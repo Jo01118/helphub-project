@@ -552,8 +552,8 @@ export default function VolunteerDashboard() {
               <div className="glass-card fade-in">
                 <h2 style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }}>My Volunteer Profile</h2>
                 <div style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '15px', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                  <p style={{ margin: '0 0 5px 0', color: 'var(--text-muted)' }}>Volunteer ID / Account ID</p>
-                  <strong style={{ fontSize: '1.2rem' }}>{userData.id}</strong>
+                  <p style={{ margin: '0 0 5px 0', color: 'var(--text-muted)' }}>Volunteer Account ID (Username)</p>
+                  <strong style={{ fontSize: '1.2rem' }}>{userData.username}</strong>
                 </div>
                 
                 {profileMsg.text && (

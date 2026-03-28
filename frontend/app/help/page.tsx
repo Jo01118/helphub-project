@@ -123,7 +123,9 @@ export default function HelpChat() {
                   backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
                   border: msg.sender === 'bot' ? '1px solid var(--border)' : 'none',
                   color: msg.sender === 'user' ? '#fff' : 'var(--text-main)',
-                  lineHeight: '1.5'
+                  lineHeight: '1.5',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word'
                 }}>
                   {msg.text}
                 </div>
