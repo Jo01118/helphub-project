@@ -44,7 +44,8 @@ You MUST respond ONLY in ${targetLang}. Even if the user asks in English, you mu
     })) : [];
 
     // Robust Multi-Model Fallback System
-    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro", "gemini-1.0-pro"];
+    // Prioritizing gemini-2.5-flash as it was the working version for this project
+    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
     let result;
     let lastError;
 
