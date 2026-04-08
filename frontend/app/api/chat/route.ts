@@ -43,34 +43,67 @@ You MUST respond ONLY in ${targetLang}. Even if the user asks in English, you mu
       parts: [{ text: msg.text }],
     })) : [];
 
-    // Use gemini-1.5-flash-latest which is the most compatible version
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest", systemInstruction: systemPrompt });
-
+    // Robust Multi-Model Fallback System
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro", "gemini-1.0-pro"];
     let result;
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        const chat = model.startChat({
-          history: formattedHistory,
-          generationConfig: {
-            maxOutputTokens: 1000, // Increased further to ensure full responses
-          },
-        });
+    let lastError;
 
-        result = await chat.sendMessage(message);
-        break; // Success
-      } catch (err: any) {
-        // Handle both 503 (busy) and 429 (rate limit) with retries
-        if ((err.message?.includes('503') || err.message?.includes('429')) && retries > 1) {
-          retries--;
-          await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
-          continue;
+    for (const modelName of modelsToTry) {
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          // Legacy models (1.0) often don't support systemInstruction in getGenerativeModel
+          const isLegacy = modelName.includes("pro") && !modelName.includes("1.5");
+          
+          const modelOptions: any = { model: modelName };
+          if (!isLegacy) {
+            modelOptions.systemInstruction = systemPrompt;
+          }
+          
+          const model = genAI.getGenerativeModel(modelOptions);
+
+          const chat = model.startChat({
+            history: formattedHistory,
+            generationConfig: {
+              maxOutputTokens: 1000,
+            },
+          });
+
+          // For legacy models, prepend the system prompt to the user message
+          const finalMessage = isLegacy 
+            ? `[SYSTEM INSTRUCTIONS]: ${systemPrompt}\n\n[USER]: ${message}` 
+            : message;
+
+          result = await chat.sendMessage(finalMessage);
+          break; // Success with this model
+        } catch (err: any) {
+          lastError = err;
+          console.warn(`Gemini Attempt failed for ${modelName}:`, err.message);
+          
+          // If model not found (404), skip to next model immediately
+          if (err.message?.includes('404')) {
+            retries = 0; 
+            break; 
+          }
+          
+          // Handle rate limits (429) or busy (503) with retries
+          if ((err.message?.includes('503') || err.message?.includes('429')) && retries > 1) {
+            retries--;
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            continue;
+          }
+          
+          // Other errors: move to next model
+          retries = 0;
+          break;
         }
-        throw err;
       }
+      if (result) break;
     }
 
-    if (!result) throw new Error("Failed to get response after retries");
+    if (!result) {
+      throw lastError || new Error("Failed to get response from any Gemini model.");
+    }
 
     const responseText = result.response.text();
 
