@@ -65,42 +65,50 @@ export default function UserDashboard() {
   const [loadingReports, setLoadingReports] = useState(false);
 
   useEffect(() => {
-    // Check if token exists, else redirect
-    if (!localStorage.getItem('access')) {
-      window.location.href = '/user';
-      return;
-    }
-
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
       if (hash === 'report' || hash === 'my_reports' || hash === 'profile') {
         setActiveTab(hash as any);
       }
     };
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
 
+    try {
+      // Check if token exists, else redirect
+      if (!localStorage.getItem('access')) {
+        window.location.href = '/user';
+        return;
+      }
 
-    // Initialize Speech Recognition
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US'; 
-      
-      recognition.onresult = (event: any) => {
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
+      handleHash();
+      window.addEventListener('hashchange', handleHash);
+
+      // Initialize Speech Recognition
+      try {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US'; 
+          
+          recognition.onresult = (event: any) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+              }
+            }
+            if (finalTranscript) {
+               setVoiceText(prev => prev + ' ' + finalTranscript);
+            }
+          };
+          recognitionRef.current = recognition;
         }
-        if (finalTranscript) {
-           setVoiceText(prev => prev + ' ' + finalTranscript);
-        }
-      };
-      recognitionRef.current = recognition;
+      } catch (speechErr) {
+        console.warn('Speech recognition not supported or blocked:', speechErr);
+      }
+    } catch (globalErr) {
+      console.error('Initialization error:', globalErr);
     }
 
     setMounted(true);

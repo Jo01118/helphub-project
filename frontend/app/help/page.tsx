@@ -28,16 +28,65 @@ export default function HelpChat() {
 
   useEffect(() => {
     setMounted(true);
-    // Initialize greeting in the correct language
-    setMessages([
-      {
-        id: 1,
-        text: t('assistant_greeting'),
-        sender: 'bot',
-        timestamp: new Date()
-      }
-    ]);
-  }, []);
+    
+    if (language === 'en') {
+      // Standard greeting for English users
+      setMessages([
+        {
+          id: 1,
+          text: t('assistant_greeting') || "Hello! I am your HelpHub assistant. How can I help you today?",
+          sender: 'bot',
+          timestamp: new Date()
+        }
+      ]);
+    } else {
+      // FAQ and Team Notice for Non-English users
+      setMessages([
+        {
+          id: 1,
+          text: "Support in your language is coming soon! Our team is currently working on the local language bot update.",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 2,
+          text: "Common Questions & Answers (English Support Only):",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 3,
+          text: "❓ I can't upload image?\nAnswer: Check your internet connection and ensure the file size is under 5MB. You can also try taking a lower resolution photo.",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 4,
+          text: "❓ Location not working?\nAnswer: Ensure your GPS/Location services are enabled on your device. On browsers, allow location permissions for HelpHub.",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 5,
+          text: "❓ How to report issue?\nAnswer: Go to your Dashboard, click 'Report an Issue', select a location, add a category and description, and click Submit.",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 6,
+          text: "❓ How to register as volunteer?\nAnswer: Go to the Login/Register page and select the 'Volunteer' option during registration.",
+          sender: 'bot',
+          timestamp: new Date()
+        },
+        {
+          id: 7,
+          text: "If your query is not listed above, please contact our team directly at: helphubreporting.team@gmail.com",
+          sender: 'bot',
+          timestamp: new Date()
+        }
+      ]);
+    }
+  }, [language]);
 
   useEffect(() => {
     scrollToBottom();
@@ -47,7 +96,7 @@ export default function HelpChat() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || language !== 'en') return;
 
     const userMsg: Message = {
       id: Date.now(),
@@ -61,14 +110,13 @@ export default function HelpChat() {
     setIsTyping(true);
 
     try {
-      // Call the new real AI Gemini endpoint
+      // Call the stable Gemini endpoint
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: userMsg.text,
           language: language,
-          // Pass context of the conversation so the model has memory (excluding the first system greeting)
           history: messages.length > 1 ? messages.slice(1) : []
         })
       });
@@ -112,10 +160,10 @@ export default function HelpChat() {
               ⬅️ {t('back')}
             </button>
             <h2 style={{ color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              🤖 {t('assistant_title')}
+              🤖 {language === 'en' ? t('assistant_title') : 'Support FAQ'}
             </h2>
             <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              {t('assistant_subtitle')}
+              {language === 'en' ? t('assistant_subtitle') : 'Common Questions & Offline Support'}
             </p>
           </div>
 
@@ -128,7 +176,7 @@ export default function HelpChat() {
                 width: '100%'
               }}>
                 <div style={{
-                  maxWidth: '75%',
+                  maxWidth: '85%',
                   padding: '12px 16px',
                   borderRadius: msg.sender === 'user' ? '16px 16px 0 16px' : '16px 16px 16px 0',
                   backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
@@ -136,7 +184,8 @@ export default function HelpChat() {
                   color: msg.sender === 'user' ? '#fff' : 'var(--text-main)',
                   lineHeight: '1.5',
                   overflowWrap: 'anywhere',
-                  wordBreak: 'break-word'
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-line'
                 }}>
                   {msg.text}
                 </div>
@@ -164,31 +213,37 @@ export default function HelpChat() {
           </div>
 
           <div style={{ padding: '1rem', borderTop: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-            <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={t('chat_placeholder')}
-                style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-              />
-              <button
-                type="submit"
-                style={{
-                  padding: '0 25px',
-                  backgroundColor: 'var(--primary)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '30px',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  transition: 'background-color 0.2s'
-                }}
-                disabled={!inputText.trim()}
-              >
-                {t('submit')}
-              </button>
-            </form>
+            {language === 'en' ? (
+              <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder={t('chat_placeholder')}
+                  style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    padding: '0 25px',
+                    backgroundColor: 'var(--primary)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '30px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    transition: 'background-color 0.2s'
+                  }}
+                  disabled={!inputText.trim()}
+                >
+                  {t('submit')}
+                </button>
+              </form>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '10px', color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500 }}>
+                🚫 Chat typing is reserved for English support. Our team will bring local language bot updates soon!
+              </div>
+            )}
           </div>
 
         </div>
