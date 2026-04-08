@@ -64,6 +64,13 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('admin_access');
+    localStorage.removeItem('access');
+    localStorage.removeItem('userRole');
+    window.location.href = '/access';
+  }
+
   const fetchAdminData = async () => {
     setIsRefreshing(true);
     try {
@@ -334,16 +341,21 @@ export default function AdminDashboard() {
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-main)' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--primary)' }}>🏛️ Admin Control Center</h1>
-        <button onClick={fetchAdminData} disabled={isRefreshing} style={{ padding: '8px 16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '5px', cursor: isRefreshing ? 'wait' : 'pointer', fontWeight: 'bold' }}>
-          {isRefreshing ? '⏳ Refreshing...' : '🔄 Refresh Data'}
-        </button>
+      <header style={{ backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--primary)' }}>🏛️ Admin Control Center</h1>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={fetchAdminData} disabled={isRefreshing} style={{ padding: '8px 16px', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '5px', cursor: isRefreshing ? 'wait' : 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            {isRefreshing ? '⏳ ...' : '🔄 Refresh'}
+          </button>
+          <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            {t('logout')}
+          </button>
+        </div>
       </header>
 
       {/* Tabs removed for global hamburger nav */}
 
-      <div style={{ padding: '2rem', flex: 1 }}>
+      <div style={{ padding: '1rem', flex: 1 }}>
         <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
           
           {activeTab === 'reports' && (

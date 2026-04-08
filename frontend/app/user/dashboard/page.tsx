@@ -288,13 +288,16 @@ export default function UserDashboard() {
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'var(--surface)', padding: '1rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 600 }}>{mounted ? t('user_dashboard') : 'User Dashboard'}</h1>
+      <header style={{ backgroundColor: 'var(--surface)', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <h1 style={{ color: 'var(--primary)', fontSize: '1.25rem', fontWeight: 600 }}>{mounted ? t('user_dashboard') : 'User Dashboard'}</h1>
+        <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+          {t('logout')}
+        </button>
       </header>
       {/* Tabs removed for global navigation */}
 
       {/* Content */}
-      <div style={{ padding: '2rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
+      <div style={{ padding: '1rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
         <div style={{ width: '100%', maxWidth: '800px' }}>
           {!mounted ? (
             <div style={{ textAlign: 'center', color: 'var(--primary)', marginTop: '2rem' }}>Loading Dashboard...</div>

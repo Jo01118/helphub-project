@@ -265,8 +265,11 @@ export default function VolunteerDashboard() {
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'var(--surface)', padding: '1rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--secondary)', fontSize: '1.5rem', fontWeight: 600 }}>Volunteer Dashboard</h1>
+      <header style={{ backgroundColor: 'var(--surface)', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        <h1 style={{ color: 'var(--secondary)', fontSize: '1.25rem', fontWeight: 600 }}>Volunteer Dashboard</h1>
+        <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+          {t('logout')}
+        </button>
       </header>
 
       {/* Setup Modal */}
@@ -291,7 +294,7 @@ export default function VolunteerDashboard() {
       )}
 
       {/* Location Confirmation Step */}
-      <div style={{ padding: '2rem 2rem 0 2rem', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ padding: '1rem 1rem 0 1rem', display: 'flex', justifyContent: 'center' }}>
         <div style={{ width: '100%', maxWidth: '800px' }}>
           <div className="glass-card fade-in" style={{ marginBottom: isLocationConfirmed ? '1rem' : '2rem' }}>
             <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>📍 {isLocationConfirmed ? 'Active Navigation Point' : 'Step 1: Confirm Your Location'}</h2>
@@ -383,7 +386,7 @@ export default function VolunteerDashboard() {
       {loadingReports ? (
         <div style={{ padding: '2rem', textAlign: 'center' }}>Loading tasks securely...</div>
       ) : (
-        <div style={{ padding: '2rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: '1rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
           <div style={{ width: '100%', maxWidth: '800px' }}>
             
             {activeTab === 'assigned' && (

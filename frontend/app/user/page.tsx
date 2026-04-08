@@ -83,6 +83,7 @@ export default function UserPortal() {
         });
         localStorage.setItem('access', data.access);
         if (data.refresh) localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('userRole', 'USER');
         window.location.href = '/user/dashboard';
       } else {
         // Registration

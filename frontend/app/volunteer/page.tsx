@@ -168,6 +168,7 @@ export default function VolunteerPortal() {
               onClick={() => {
                  localStorage.setItem('access', approvedData.access);
                  if (approvedData.refresh) localStorage.setItem('refresh', approvedData.refresh);
+                 localStorage.setItem('userRole', 'VOLUNTEER');
                  window.location.href = '/volunteer/dashboard';
               }}
             >

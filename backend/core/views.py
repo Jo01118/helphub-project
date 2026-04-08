@@ -11,14 +11,16 @@ from datetime import timedelta
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-    if user.role == 'ADMIN' or user.is_superuser:
+    # Persistent session for volunteers and admins (365 days)
+    if user.role in ['ADMIN', 'VOLUNTEER'] or user.is_superuser:
         refresh.set_exp(lifetime=timedelta(days=365))
         access_token = refresh.access_token
         access_token.set_exp(lifetime=timedelta(days=365))
     else:
-        refresh.set_exp(lifetime=timedelta(hours=42))
+        # Standard user session: 48 hours
+        refresh.set_exp(lifetime=timedelta(hours=48))
         access_token = refresh.access_token
-        access_token.set_exp(lifetime=timedelta(hours=42))
+        access_token.set_exp(lifetime=timedelta(hours=48))
     return str(refresh), str(access_token)
 
 @api_view(['POST'])
