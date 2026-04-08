@@ -43,8 +43,8 @@ You MUST respond ONLY in ${targetLang}. Even if the user asks in English, you mu
       parts: [{ text: msg.text }],
     })) : [];
 
-    // Use gemini-1.5-flash which has a high free quota (1,500 requests/day)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+    // Use gemini-1.5-flash-latest which is the most compatible version
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest", systemInstruction: systemPrompt });
 
     let result;
     let retries = 3;
