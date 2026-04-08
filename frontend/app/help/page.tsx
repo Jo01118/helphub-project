@@ -26,11 +26,68 @@ export default function HelpChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Localized FAQ Content Mapping for UI
+  const faqData: any = {
+    'en': {
+      title: 'Support FAQ',
+      subtitle: 'Common Questions & Offline Support',
+      instruction: 'Here are the common questions and answers:',
+      qa: [
+        { q: "❓ I can't upload image?", a: "Answer: Check your internet connection and ensure the file size is under 5MB. You can also try taking a lower resolution photo." },
+        { q: "❓ Location not working?", a: "Answer: Ensure your GPS/Location services are enabled on your device. On browsers, allow location permissions for HelpHub." },
+        { q: "❓ How to report issue?", a: "Answer: Go to your Dashboard, click 'Report an Issue', select a location, add a category and description, and click Submit." },
+        { q: "❓ How to register as volunteer?", a: "Answer: Go to the Login/Register page and select the 'Volunteer' option during registration." }
+      ],
+      footer: 'If your query is not listed above, please contact our team directly at: helphubreporting.team@gmail.com',
+      placeholder: '🚫 Chat typing is reserved for English support.'
+    },
+    'te': { // Telugu
+      title: 'సహాయం FAQ',
+      subtitle: 'సాధారణ ప్రశ్నలు & పరిష్కారాలు',
+      instruction: 'సాధారణ ప్రశ్నలు మరియు సమాధానాలు ఇక్కడ ఉన్నాయి:',
+      qa: [
+        { q: "❓ నేను ఫోటోను అప్‌లోడ్ చేయలేకపోతున్నాను?", a: "సమాధానం: మీ ఇంటర్నెట్ కనెక్షన్‌ని తనిఖీ చేయండి. ఫోటో సైజు 5MB లోపు ఉండేలా చూసుకోండి." },
+        { q: "❓ లొకేషన్ పనిచేయడం లేదు?", a: "సమాధానం: మీ ఫోన్‌లోని GPS ఆన్ చేసి ఉందని నిర్ధారించుకోండి. బ్రౌజర్‌లో లొకేషన్ పర్మిషన్లు ఇవ్వండి." },
+        { q: "❓ సమస్యను ఎలా నివేదించాలి?", a: "సమాధానం: మీ డ్యాష్‌బోర్డ్‌కు వెళ్లి, 'సమస్యను నివేదించు' (Report an Issue) క్లిక్ చేయండి." },
+        { q: "❓ వాలంటీర్‌గా ఎలా నమోదు చేసుకోవాలి?", a: "సమాధానం: లాగిన్ పేజీకి వెళ్లి, 'వాలంటీర్' (Volunteer) ఎంపికను ఎంచుకోండి." }
+      ],
+      footer: 'మీ ప్రశ్న ఇక్కడ లేకపోతే, దయచేసి మా బృందాన్ని ఇమెయిల్ ద్వారా సంప్రదించండి: helphubreporting.team@gmail.com',
+      placeholder: '🚫 చాట్ టైపింగ్ ఇంగ్లీష్ సపోర్ట్ కోసం మాత్రమే అందుబాటులో ఉంది.'
+    },
+    'hi': { // Hindi
+      title: 'सहायता FAQ',
+      subtitle: 'सामान्य प्रश्न और समाधान',
+      instruction: 'यहाँ सामान्य प्रश्न और उत्तर दिए गए हैं:',
+      qa: [
+        { q: "❓ मैं फोटो अपलोड नहीं कर पा रहा हूँ?", a: "उत्तर: अपने इंटरनेट की जांच करें। फोटो का आकार 5MB से कम होना चाहिए।" },
+        { q: "❓ लोकेशन काम नहीं कर रहा है?", a: "उत्तर: सुनिश्चित करें कि आपके फोन का GPS ऑन है। ब्राउज़र में लोकेशन की अनुमति दें।" },
+        { q: "❓ शिकायत कैसे दर्ज करें?", a: "उत्तर: डैशबोर्ड पर जाएं और 'रिपोर्ट एन इश्यू' पर क्लिक करें।" },
+        { q: "❓ वॉलंटियर के रूप में पंजीकरण कैसे करें?", a: "उत्तर: लॉगिन पेज पर जाएं और 'वॉलंटियर' विकल्प चुनें।" }
+      ],
+      footer: 'यदि आपका प्रश्न यहाँ नहीं है, तो कृपया हमें ईमेल करें: helphubreporting.team@gmail.com',
+      placeholder: '🚫 चैट टाइपिंग केवल अंग्रेजी सहायता के लिए उपलब्ध है।'
+    },
+    'ta': { // Tamil
+      title: 'உதவி FAQ',
+      subtitle: 'பொதுவான கேள்விகள் மற்றும் தீர்வுகள்',
+      instruction: 'பொதுவான கேள்விகள் மற்றும் பதில்கள் இங்கே உள்ளன:',
+      qa: [
+        { q: "❓ என்னால் புகைப்படத்தைப் பதிவேற்ற முடியவில்லையா?", a: "பதில்: உங்கள் இணைய இணைப்பைச் சரிபார்க்கவும். புகைப்படம் 5MB க்கும் குறைவாக இருப்பதை உறுதி செய்யவும்." },
+        { q: "❓ இருப்பிடம் (Location) வேலை செய்யவில்லையா?", a: "பதில்: உங்கள் போனில் GPS இயக்கப்பட்டுள்ளதா என்பதை உறுதிப்படுத்தவும்." },
+        { q: "❓ புகாரை எவ்வாறு பதிவு செய்வது?", a: "பதில்: டேஷ்போர்டிற்குச் சென்று, 'Report an Issue' என்பதை கிளிக் செய்யவும்." },
+        { q: "❓ தன்னார்வலராக (Volunteer) பதிவு செய்வது எப்படி?", a: "பதில்: உள்நுழைவு (Login) பக்கத்திற்குச் சென்று, 'Volunteer' என்பதைத் தேர்ந்தெடுக்கவும்." }
+      ],
+      footer: 'உங்கள் கேள்வி இங்கே இல்லை என்றால், மின்னஞ்சல் மூலம் எங்களைத் தொடர்பு கொள்ளவும்: helphubreporting.team@gmail.com',
+      placeholder: '🚫 அரட்டை தட்டச்சு ஆங்கில ஆதரவிற்கு மட்டுமே ஒதுக்கப்பட்டுள்ளது.'
+    }
+  };
+
+  const currentFaq = faqData[language] || faqData['en'];
+
   useEffect(() => {
     setMounted(true);
     
     if (language === 'en') {
-      // Standard greeting for English users
       setMessages([
         {
           id: 1,
@@ -40,51 +97,27 @@ export default function HelpChat() {
         }
       ]);
     } else {
-      // FAQ and Team Notice for Non-English users
-      setMessages([
-        {
-          id: 1,
-          text: "Support in your language is coming soon! Our team is currently working on the local language bot update.",
+      const initialMessages: Message[] = [
+        { id: 1, text: currentFaq.instruction, sender: 'bot', timestamp: new Date() }
+      ];
+      
+      currentFaq.qa.forEach((item: any, idx: number) => {
+        initialMessages.push({
+          id: idx + 2,
+          text: `${item.q}\n${item.a}`,
           sender: 'bot',
           timestamp: new Date()
-        },
-        {
-          id: 2,
-          text: "Common Questions & Answers (English Support Only):",
-          sender: 'bot',
-          timestamp: new Date()
-        },
-        {
-          id: 3,
-          text: "❓ I can't upload image?\nAnswer: Check your internet connection and ensure the file size is under 5MB. You can also try taking a lower resolution photo.",
-          sender: 'bot',
-          timestamp: new Date()
-        },
-        {
-          id: 4,
-          text: "❓ Location not working?\nAnswer: Ensure your GPS/Location services are enabled on your device. On browsers, allow location permissions for HelpHub.",
-          sender: 'bot',
-          timestamp: new Date()
-        },
-        {
-          id: 5,
-          text: "❓ How to report issue?\nAnswer: Go to your Dashboard, click 'Report an Issue', select a location, add a category and description, and click Submit.",
-          sender: 'bot',
-          timestamp: new Date()
-        },
-        {
-          id: 6,
-          text: "❓ How to register as volunteer?\nAnswer: Go to the Login/Register page and select the 'Volunteer' option during registration.",
-          sender: 'bot',
-          timestamp: new Date()
-        },
-        {
-          id: 7,
-          text: "If your query is not listed above, please contact our team directly at: helphubreporting.team@gmail.com",
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]);
+        });
+      });
+
+      initialMessages.push({
+        id: 100,
+        text: currentFaq.footer,
+        sender: 'bot',
+        timestamp: new Date()
+      });
+
+      setMessages(initialMessages);
     }
   }, [language]);
 
@@ -160,10 +193,10 @@ export default function HelpChat() {
               ⬅️ {t('back')}
             </button>
             <h2 style={{ color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              🤖 {language === 'en' ? t('assistant_title') : 'Support FAQ'}
+              🤖 {currentFaq.title}
             </h2>
             <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              {language === 'en' ? t('assistant_subtitle') : 'Common Questions & Offline Support'}
+              {currentFaq.subtitle}
             </p>
           </div>
 
@@ -241,7 +274,7 @@ export default function HelpChat() {
               </form>
             ) : (
               <div style={{ textAlign: 'center', padding: '10px', color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500 }}>
-                🚫 Chat typing is reserved for English support. Our team will bring local language bot updates soon!
+                {currentFaq.placeholder}
               </div>
             )}
           </div>
