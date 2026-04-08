@@ -9,6 +9,7 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  devIndicators: false,
   // @ts-ignore
   turbopack: {}
 };

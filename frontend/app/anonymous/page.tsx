@@ -32,6 +32,7 @@ export default function AnonymousReport() {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setCategory(val);
+    setIssueType('');
     if (val.trim()) {
       setSuggestions(getIssueSuggestions(val));
     } else {

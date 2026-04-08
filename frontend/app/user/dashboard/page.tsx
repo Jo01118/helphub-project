@@ -42,6 +42,8 @@ export default function UserDashboard() {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setCategory(val);
+    // Clear issueType when user starts typing again so suggestions reappear
+    setIssueType('');
     if (val.trim()) {
       setSuggestions(getIssueSuggestions(val));
     } else {
@@ -384,7 +386,7 @@ export default function UserDashboard() {
                   style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '10px' }}
                 />
                 
-                {suggestions.length > 0 && (
+                {suggestions.length > 0 && !issueType && (
                   <div style={{ marginBottom: '1rem', padding: '10px', backgroundColor: 'var(--surface)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
                     <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>✨ Smart Suggestions (Click to select):</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
