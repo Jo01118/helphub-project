@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
-import { request, requestFormData } from '../../utils/api';
+import { request, requestFormData, BASE_URL } from '../../utils/api';
 import { getLocationName, searchLocationCoords } from '../../utils/geocoding';
 import { getIssueSuggestions } from '../../utils/aiSuggestions';
 
@@ -511,7 +511,7 @@ export default function UserDashboard() {
 
                           {report.original_audio && (
                             <div style={{ marginBottom: '15px' }}>
-                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `http://127.0.0.1:8000${report.original_audio}`} controls style={{ width: '100%' }} />
+                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%' }} />
                             </div>
                           )}
 
@@ -536,16 +536,16 @@ export default function UserDashboard() {
                     </div>
                     
                     {report.photo && (
-                       <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `http://127.0.0.1:8000${report.photo}`} alt="Report Photo" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '8px', marginTop: '15px' }} />
+                       <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report Photo" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '8px', marginTop: '15px' }} />
                     )}
 
                     {report.resolved_proof && (
                       <div style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '15px', borderRadius: '8px', marginTop: '15px', border: '1px solid var(--success)' }}>
                         <strong style={{ fontSize: '1.1rem', color: 'var(--success)' }}>✅ Issue Resolved - Proof Provided:</strong>
                         {report.resolved_proof.match(/\.(mp4|webm|ogg)$/i) ? (
-                          <video src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} controls style={{ width: '100%', maxHeight: '400px', marginTop: '10px', borderRadius: '8px' }} />
+                          <video src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `${BASE_URL}${report.resolved_proof}`} controls style={{ width: '100%', maxHeight: '400px', marginTop: '10px', borderRadius: '8px' }} />
                         ) : (
-                          <img src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} alt="Resolution Proof" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', marginTop: '10px', borderRadius: '8px' }} />
+                          <img src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `${BASE_URL}${report.resolved_proof}`} alt="Resolution Proof" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', marginTop: '10px', borderRadius: '8px' }} />
                         )}
                       </div>
                     )}

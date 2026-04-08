@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { request } from '../utils/api';
+import { request, BASE_URL } from '../utils/api';
 import { getLocationName } from '../utils/geocoding';
 
 export default function AdminDashboard() {
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
   const handleDownloadBase64 = async (dataString: string, filename: string) => {
       try {
           if (!dataString.startsWith('data:')) {
-             window.open(dataString.startsWith('http') ? dataString : `http://127.0.0.1:8000${dataString}`, '_blank');
+             window.open(dataString.startsWith('http') ? dataString : `${BASE_URL}${dataString}`, '_blank');
              return;
           }
           const res = await fetch(dataString);
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
 
                           {report.original_audio && (
                             <div style={{ marginBottom: '10px' }}>
-                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `http://127.0.0.1:8000${report.original_audio}`} controls style={{ width: '100%', height: '40px' }} />
+                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%', height: '40px' }} />
                             </div>
                           )}
 
@@ -416,7 +416,7 @@ export default function AdminDashboard() {
                       );
                     })()}
                     
-                    {report.photo && <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `http://127.0.0.1:8000${report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />}
+                    {report.photo && <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />}
                     
                     {(report.contact_info || report.user_details?.email || report.user_details?.username) && (
                       <div style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '5px 10px', marginTop: '10px', borderRadius: '4px', fontSize: '0.85rem' }}>
@@ -444,9 +444,9 @@ export default function AdminDashboard() {
                       <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: 'rgba(46, 204, 113, 0.1)', borderRadius: '8px', border: '1px solid var(--success)' }}>
                         <strong style={{ color: 'var(--success)', display: 'block', marginBottom: '8px' }}>📸 Resolution Proof:</strong>
                         {report.resolved_proof.match(/\.(mp4|webm|ogg)$/i) ? (
-                          <video src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} controls style={{ width: '100%', maxHeight: '300px', borderRadius: '8px' }} />
+                          <video src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `${BASE_URL}${report.resolved_proof}`} controls style={{ width: '100%', maxHeight: '300px', borderRadius: '8px' }} />
                         ) : (
-                          <img src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `http://127.0.0.1:8000${report.resolved_proof}`} alt="Resolution Proof" style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px' }} />
+                          <img src={report.resolved_proof.startsWith('http') || report.resolved_proof.startsWith('data:') ? report.resolved_proof : `${BASE_URL}${report.resolved_proof}`} alt="Resolution Proof" style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px' }} />
                         )}
                         {report.status === 'RESOLVED' && (
                            <button onClick={() => handleResolutionMessage(report.id)} style={{ marginTop: '10px', width: '100%', padding: '10px', backgroundColor: 'var(--success)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -616,7 +616,7 @@ export default function AdminDashboard() {
 
                                 {group.report.original_audio && (
                                   <div style={{ marginBottom: '10px' }}>
-                                    <audio src={group.report.original_audio.startsWith('http') || group.report.original_audio.startsWith('data:') ? group.report.original_audio : `http://127.0.0.1:8000${group.report.original_audio}`} controls style={{ width: '100%', height: '40px' }} />
+                                    <audio src={group.report.original_audio.startsWith('http') || group.report.original_audio.startsWith('data:') ? group.report.original_audio : `${BASE_URL}${group.report.original_audio}`} controls style={{ width: '100%', height: '40px' }} />
                                   </div>
                                 )}
 
@@ -630,7 +630,7 @@ export default function AdminDashboard() {
                             );
                           })()}
                           
-                          {group.report.photo && <img src={group.report.photo.startsWith('http') || group.report.photo.startsWith('data:') ? group.report.photo : `http://127.0.0.1:8000${group.report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />}
+                          {group.report.photo && <img src={group.report.photo.startsWith('http') || group.report.photo.startsWith('data:') ? group.report.photo : `${BASE_URL}${group.report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />}
 
                           <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
                              <strong>📍 {group.report.location_name || 'Location'}</strong><br/>
