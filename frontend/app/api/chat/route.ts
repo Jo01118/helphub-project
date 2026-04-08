@@ -44,7 +44,9 @@ You MUST respond ONLY in ${targetLang}. Even if the user asks in English, you mu
     })) : [];
 
     // Robust Multi-Model Fallback System
-    // Prioritizing gemini-2.5-flash as it was the working version for this project
+    // IMPORTANT: DO NOT CHANGE THE ORDER OF THESE MODELS.
+    // 'gemini-2.5-flash' is a specific identifier that works correctly for this project's API key.
+    // Standard models like 'gemini-1.5-flash' have caused 404 errors in this environment.
     const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
     let result;
     let lastError;
