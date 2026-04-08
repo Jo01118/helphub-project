@@ -8,6 +8,7 @@ import { getIssueSuggestions } from '../../utils/aiSuggestions';
 
 export default function UserDashboard() {
   const { t, language } = useLanguage();
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'report' | 'my_reports' | 'profile'>('report');
   
   // Profile State
@@ -102,6 +103,7 @@ export default function UserDashboard() {
       recognitionRef.current = recognition;
     }
 
+    setMounted(true);
     fetchProfile();
     fetchMyReports();
     
@@ -122,12 +124,8 @@ export default function UserDashboard() {
     try {
       // The backend API handles filtering by user due to authentication context!
       const data = await request('/reports/');
-      // We will enhance the locations for older reports on the fly
-      const enhancedData = await Promise.all(data.map(async (r: any) => {
-         const name = await getLocationName(r.latitude, r.longitude);
-         return { ...r, location_name: name };
-      }));
-      setReports(enhancedData);
+      // We will use the location_name stored in the database for speed
+      setReports(data);
     } catch (err: any) {
       console.error('Failed to fetch reports:', err);
       if (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out')) {
@@ -210,6 +208,7 @@ export default function UserDashboard() {
       // Combine manual text and voice text for the backend
       const combinedText = `[Category]: ${category || 'General'}\n[Issue]: ${issueType || 'Not specified'}\n[Voice]: ${voiceText}\n\n[Text]: ${manualText}`;
       formData.append('text', combinedText);
+      formData.append('location_name', locName);
       formData.append('language', language);
 
       if (photo) {
@@ -290,15 +289,18 @@ export default function UserDashboard() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', padding: '1rem 2rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 600 }}>User Dashboard</h1>
+        <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 600 }}>{mounted ? t('user_dashboard') : 'User Dashboard'}</h1>
       </header>
       {/* Tabs removed for global navigation */}
 
       {/* Content */}
       <div style={{ padding: '2rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
         <div style={{ width: '100%', maxWidth: '800px' }}>
-          
-          {activeTab === 'report' && (
+          {!mounted ? (
+            <div style={{ textAlign: 'center', color: 'var(--primary)', marginTop: '2rem' }}>Loading Dashboard...</div>
+          ) : (
+            <>
+              {activeTab === 'report' && (
             <div className="glass-card fade-in">
               <h2 style={{ marginBottom: '1.5rem' }}>{t('report_issue')}</h2>
                           <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '15px', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid var(--primary)' }}>
@@ -322,13 +324,13 @@ export default function UserDashboard() {
                   </div>
                 ) : (
                   <>
-                    <strong style={{ display: 'block', marginBottom: '10px' }}>📍 Search Location:</strong> 
+                    <strong style={{ display: 'block', marginBottom: '10px' }}>{t('search_location')}</strong> 
                     <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
                       <input 
                         type="text" 
                         value={searchQuery} 
                         onChange={e => setSearchQuery(e.target.value)} 
-                        placeholder="Type city or area (e.g. Tirupati, Andhra Pradesh)"
+                        placeholder={t('search_placeholder')}
                         style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}
                       />
                       <button 
@@ -338,17 +340,17 @@ export default function UserDashboard() {
                         disabled={isSearching}
                         style={{ padding: '0 20px', borderRadius: '6px' }}
                       >
-                        {isSearching ? 'Searching...' : 'Search'}
+                        {isSearching ? t('searching') : t('search_button')}
                       </button>
                     </div>
 
                     {location ? (
                        <div>
                          <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
-                           Selected: {locName}
+                           {t('selected_issue')}: {locName}
                          </span>
                          <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
-                           Coordinates: {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                           {t('confirmed_coords')}: {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
                          </span>
                          
                          <iframe 
@@ -364,12 +366,12 @@ export default function UserDashboard() {
                            style={{ width: '100%', backgroundColor: 'var(--success)', padding: '12px', fontSize: '1rem' }}
                            onClick={() => setIsLocationConfirmed(true)}
                          >
-                           ✅ Confirm This Location
+                           {t('confirm_location_button')}
                          </button>
                        </div>
                      ) : (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                          Please search for a location to view the map and verify your coordinates before submitting.
+                          {t('search_help_text')}
                         </span>
                      )}
                   </>
@@ -377,18 +379,18 @@ export default function UserDashboard() {
                </div>
 
               <form onSubmit={handleSubmitReport}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>🏷️ Category</label>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>{t('category')}</label>
                 <input 
                   type="text" 
                   value={category} 
                   onChange={handleCategoryChange} 
-                  placeholder="e.g. Animal Issue, Road, Waste..."
+                  placeholder={t('category_placeholder')}
                   style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '10px' }}
                 />
                 
                 {suggestions.length > 0 && !issueType && (
                   <div style={{ marginBottom: '1rem', padding: '10px', backgroundColor: 'var(--surface)', borderRadius: '8px', border: '1px dashed var(--primary)' }}>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>✨ Smart Suggestions (Click to select):</p>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{t('smart_suggestions')}</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                       {suggestions.map((sug, idx) => (
                         <button
@@ -420,17 +422,17 @@ export default function UserDashboard() {
                    </div>
                 )}
 
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>📸 Upload Photo</label>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>{t('upload_photo')}</label>
                 <input type="file" accept="image/*" onChange={(e) => e.target.files && setPhoto(e.target.files[0])} style={{ marginBottom: '1rem' }} />
 
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>🎤 Voice Input</label>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>{t('voice_input')}</label>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', alignItems: 'center' }}>
                   {!isRecording ? (
-                    <button type="button" onClick={handleStartRecording} style={{ padding: '10px 20px', backgroundColor: 'var(--primary)', color: 'white' }}>Start Recording</button>
+                    <button type="button" onClick={handleStartRecording} style={{ padding: '10px 20px', backgroundColor: 'var(--primary)', color: 'white' }}>{t('start_recording')}</button>
                   ) : (
-                    <button type="button" onClick={handleStopRecording} style={{ padding: '10px 20px', backgroundColor: 'var(--error)', color: 'white' }}>Stop Recording</button>
+                    <button type="button" onClick={handleStopRecording} style={{ padding: '10px 20px', backgroundColor: 'var(--error)', color: 'white' }}>{t('stop_recording')}</button>
                   )}
-                  {isRecording && <span style={{ color: 'var(--error)', fontWeight: 'bold' }}>Recording...</span>}
+                  {isRecording && <span style={{ color: 'var(--error)', fontWeight: 'bold' }}>{t('recording_status')}</span>}
                 </div>
                 
                 {audioURL && (
@@ -441,28 +443,28 @@ export default function UserDashboard() {
                 
                 {voiceText && (
                   <div style={{ marginBottom: '1rem', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }}>
-                    <strong>Converted Text:</strong> <p>{voiceText}</p>
+                    <strong>{t('converted_text')}:</strong> <p>{voiceText}</p>
                   </div>
                 )}
 
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>⌨️ Manual Text Input</label>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, marginTop: '1rem' }}>{t('manual_input')}</label>
                 <textarea 
                   rows={4} 
-                  placeholder="Describe the issue in detail..." 
+                  placeholder={t('manual_input_placeholder')} 
                   value={manualText} 
                   onChange={(e) => setManualText(e.target.value)} required={!voiceText} 
                 />
 
                 <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem', backgroundColor: 'var(--surface)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Leave Contact Info (Optional)</label>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>If there are no nearby volunteers, an admin can contact you regarding this issue.</p>
-                  <input type="text" placeholder="Email or Phone Number" value={contactInfo} onChange={e => setContactInfo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }} />
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>{t('contact_info_label')}</label>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>{t('contact_info_help')}</p>
+                  <input type="text" placeholder={t('contact_info_placeholder')} value={contactInfo} onChange={e => setContactInfo(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }} />
                 </div>
 
                 <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1.5rem', padding: '15px' }} disabled={!isLocationConfirmed || submitLoading}>
-                  {submitLoading ? 'Saving...' : t('submit')}
+                  {submitLoading ? t('saving') : t('submit')}
                 </button>
-                {!isLocationConfirmed && <p style={{ color: 'var(--error)', fontSize: '0.9rem', textAlign: 'center', marginTop: '10px' }}>Please strictly confirm your location above before submitting a report.</p>}
+                {!isLocationConfirmed && <p style={{ color: 'var(--error)', fontSize: '0.9rem', textAlign: 'center', marginTop: '10px' }}>{t('strict_location_warning')}</p>}
               </form>
             </div>
           )}
@@ -474,7 +476,7 @@ export default function UserDashboard() {
                  <div style={{ textAlign: 'center', color: 'var(--primary)' }}>Loading your reports securely from the server...</div>
               ) : reports.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No reports submitted yet.
+                  {t('no_reports_yet') || 'No reports submitted yet.'}
                 </div>
               ) : (
                 reports.map((report) => (
@@ -522,8 +524,13 @@ export default function UserDashboard() {
                       );
                     })()}
                     
-                    <div style={{ backgroundColor: 'rgba(0,0,0,0.03)', padding: '10px', borderRadius: '8px', marginTop: '10px' }}>
-                      <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>📍 {report.location_name}</strong>
+                    <div style={{ backgroundColor: 'rgba(56, 189, 248, 0.05)', padding: '10px', borderRadius: '8px', marginTop: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                      <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>📍 {report.location_name || 'Geocoding...'}</strong>
+                      {!report.location_name && (
+                         <LocationEnhancer report={report} onResolved={(name) => {
+                            setReports(prev => prev.map(r => r.id === report.id ? {...r, location_name: name} : r));
+                         }} />
+                      )}
                       <br/>
                       <span style={{ fontSize: '0.85rem' }}>Lat: {report.latitude?.toFixed(6)}, Lng: {report.longitude?.toFixed(6)}</span>
                     </div>
@@ -550,9 +557,9 @@ export default function UserDashboard() {
             
             {activeTab === 'profile' && userData && (
               <div className="glass-card fade-in">
-                <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>My Profile</h2>
+                <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>{t('my_profile') || 'My Profile'}</h2>
                 <div style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '15px', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                  <p style={{ margin: '0 0 5px 0', color: 'var(--text-muted)' }}>Account ID</p>
+                  <p style={{ margin: '0 0 5px 0', color: 'var(--text-muted)' }}>{t('account_id')}</p>
                   <strong style={{ fontSize: '1.2rem' }}>{userData.id}</strong>
                 </div>
                 
@@ -564,29 +571,29 @@ export default function UserDashboard() {
                 
                 <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>Username</label>
+                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('username') || 'Username'}</label>
                     <input type="text" value={userData.username || ''} onChange={e => setUserData({...userData, username: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} required />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>Full Name</label>
+                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('name')}</label>
                     <input type="text" value={userData.first_name || ''} onChange={e => setUserData({...userData, first_name: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} />
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>Phone Number</label>
+                      <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('phone')}</label>
                       <input type="tel" value={userData.phone || ''} onChange={e => setUserData({...userData, phone: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>Age</label>
+                      <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('age')}</label>
                       <input type="number" value={userData.age || ''} onChange={e => setUserData({...userData, age: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} />
                     </div>
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>Email Address</label>
+                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('email')}</label>
                     <input type="email" value={userData.email || ''} onChange={e => setUserData({...userData, email: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>City / Location</label>
+                    <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)', fontWeight: 600 }}>{t('city')}</label>
                     <input type="text" value={userData.city || ''} onChange={e => setUserData({...userData, city: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }} />
                   </div>
                   <button type="submit" className="btn-primary" style={{ marginTop: '1rem', padding: '15px', fontSize: '1.1rem' }} disabled={profileLoading}>
@@ -635,8 +642,9 @@ export default function UserDashboard() {
 
               </div>
             )}
-            
-          </div>
+            </>
+          )}
+        </div>
       </div>
 
       {submitSuccess && (
@@ -652,4 +660,27 @@ export default function UserDashboard() {
       )}
     </main>
   );
+}
+
+// Helper component to geocode old reports exactly once when they appear in the list
+function LocationEnhancer({ report, onResolved }: { report: any, onResolved: (name: string) => void }) {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchName = async () => {
+      if (report.location_name) return;
+      setLoading(true);
+      try {
+        const name = await getLocationName(report.latitude, report.longitude);
+        onResolved(name);
+      } catch (err) {
+        console.error("Enhancement failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchName();
+  }, [report.id]);
+
+  return loading ? <span style={{ fontSize: '0.75rem', opacity: 0.7 }}> (Resolving...)</span> : null;
 }

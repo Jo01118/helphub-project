@@ -145,6 +145,7 @@ export default function AnonymousReport() {
       
       const combinedText = `[Category]: ${category || 'General'}\n[Issue]: ${issueType || 'Not specified'}\n[Voice]: ${voiceText}\n\n[Text]: ${manualText}\n[Location Info]: ${locName}`;
       formData.append('text', combinedText);
+      formData.append('location_name', locName);
       formData.append('language', 'en');
 
       if (photo) formData.append('photo', photo);

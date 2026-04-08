@@ -55,6 +55,7 @@ class Report(models.Model):
     resolved_proof = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     language = models.CharField(max_length=10, default='en')
+    location_name = models.CharField(max_length=255, blank=True, null=True)
     assigned_volunteer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_reports')
 
 class AssignmentRequest(models.Model):

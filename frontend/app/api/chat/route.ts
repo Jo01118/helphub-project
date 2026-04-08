@@ -7,13 +7,22 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'MISSING_KEY'
 
 export async function POST(req: Request) {
   try {
-    const { message, history } = await req.json();
+    const { message, history, language } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({
         text: "System Alert: The Gemini API Key is missing. Please ask the administrator to configure the GEMINI_API_KEY environment variable. Until then, I cannot answer queries dynamically."
       });
     }
+
+    // Language mapping for the prompt
+    const langNames: Record<string, string> = {
+      'en': 'English',
+      'te': 'Telugu',
+      'hi': 'Hindi',
+      'ta': 'Tamil'
+    };
+    const targetLang = langNames[language as string] || 'English';
 
     // Configure the model behavior for HelpHub
     const systemPrompt = `You are the friendly and professional automated assistant for HelpHub, a community issue-reporting application. 
@@ -23,7 +32,10 @@ Your goal is to assist users in navigating the app, reporting issues (like potho
 - If they have forgotten their password, they can use Account Recovery Codes in their Profile tab (if saved previously).
 - Standard issue resolution takes 2-4 business days via volunteers or admins.
 - If they ask out-of-scope, non-app questions, politely decline and provide the admin email: helphubreporting.team@gmail.com.
-Do not provide formatting that cannot be rendered in plain text (avoid markdown if possible, just use standard paragraphs). Keep answers concise and helpful.`;
+Do not provide formatting that cannot be rendered in plain text (avoid markdown if possible, just use standard paragraphs). Keep answers concise and helpful.
+
+IMPORTANT: The user has selected their language as: ${targetLang}. 
+You MUST respond ONLY in ${targetLang}. Even if the user asks in English, you must reply in ${targetLang}.`;
 
     // Map history to Gemini's format
     const formattedHistory = history ? history.map((msg: any) => ({
@@ -31,17 +43,35 @@ Do not provide formatting that cannot be rendered in plain text (avoid markdown 
       parts: [{ text: msg.text }],
     })) : [];
 
-    // Use Gemini 2.5 Flash as the user's API key is on the newest model tier
+    // Use gemini-2.5-flash which is verified to have available quota
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: systemPrompt });
 
-    const chat = model.startChat({
-      history: formattedHistory,
-      generationConfig: {
-        maxOutputTokens: 250,
-      },
-    });
+    let result;
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const chat = model.startChat({
+          history: formattedHistory,
+          generationConfig: {
+            maxOutputTokens: 1000, // Increased further to ensure full responses
+          },
+        });
 
-    const result = await chat.sendMessage(message);
+        result = await chat.sendMessage(message);
+        break; // Success
+      } catch (err: any) {
+        // Handle both 503 (busy) and 429 (rate limit) with retries
+        if ((err.message?.includes('503') || err.message?.includes('429')) && retries > 1) {
+          retries--;
+          await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!result) throw new Error("Failed to get response after retries");
+
     const responseText = result.response.text();
 
     return NextResponse.json({ text: responseText });

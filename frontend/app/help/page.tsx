@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '../../components/Navigation';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Message {
   id: number;
@@ -12,19 +13,14 @@ interface Message {
 }
 
 export default function HelpChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I am HelpHub's automated assistant. You can ask me questions like 'I can't upload image', 'location not working', or 'how to report issue'. How can I help you today?",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const router = useRouter();
+  const { language, t } = useLanguage();
+
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,6 +28,18 @@ export default function HelpChat() {
 
   useEffect(() => {
     setMounted(true);
+    // Initialize greeting in the correct language
+    setMessages([
+      {
+        id: 1,
+        text: t('assistant_greeting'),
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+  }, []);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
@@ -59,6 +67,7 @@ export default function HelpChat() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: userMsg.text,
+          language: language,
           // Pass context of the conversation so the model has memory (excluding the first system greeting)
           history: messages.length > 1 ? messages.slice(1) : []
         })
@@ -100,12 +109,14 @@ export default function HelpChat() {
               style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', background: 'var(--primary)', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px 15px', borderRadius: '8px', fontWeight: 'bold' }}
               title="Exit Chat"
             >
-              ⬅️ Exit
+              ⬅️ {t('back')}
             </button>
             <h2 style={{ color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              🤖 HelpHub Assistant
+              🤖 {t('assistant_title')}
             </h2>
-            <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Chat with our AI bot to get help with common issues.</p>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              {t('assistant_subtitle')}
+            </p>
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -158,7 +169,7 @@ export default function HelpChat() {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Type your question here (e.g. 'I can't upload image')..."
+                placeholder={t('chat_placeholder')}
                 style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
               />
               <button
@@ -175,7 +186,7 @@ export default function HelpChat() {
                 }}
                 disabled={!inputText.trim()}
               >
-                Send
+                {t('submit')}
               </button>
             </form>
           </div>
