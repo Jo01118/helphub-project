@@ -143,7 +143,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # WhiteNoise storage for compression and manifest support
 STORAGES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
