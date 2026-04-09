@@ -129,13 +129,27 @@ export default function VolunteerDashboard() {
     setLoadingReports(true);
     try {
       const data = await request('/reports/');
-      // Set results immediately without waiting for geocoding
-      setReports(data);
-      sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(data));
 
-      // Resolve location names lazily in background with one update
-      const updatedData = [...data];
-      const promises = data.map(async (r: any, idx: number) => {
+      // Calculate distances locally so we can show results immediately without crashing
+      const currentLat = volLat || 17.3850;
+      const currentLng = volLng || 78.4867;
+      const deg2rad = (deg: number) => deg * (Math.PI/180);
+      const R = 6371;
+
+      const resultsWithDistance = data.map((r: any) => {
+        const dLat = deg2rad(r.latitude - currentLat);
+        const dLon = deg2rad(r.longitude - currentLng); 
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(currentLat)) * Math.cos(deg2rad(r.latitude)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return { ...r, distance: R * c };
+      });
+
+      setReports(resultsWithDistance);
+      sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(resultsWithDistance));
+
+      // Resolve location names lazily in background
+      const updatedData = [...resultsWithDistance];
+      const promises = resultsWithDistance.map(async (r: any, idx: number) => {
          if (!r.location_name) {
            const name = await getLocationName(r.latitude, r.longitude);
            updatedData[idx] = { ...updatedData[idx], location_name: name };
