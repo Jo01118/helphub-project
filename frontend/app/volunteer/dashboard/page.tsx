@@ -639,11 +639,12 @@ export default function VolunteerDashboard() {
 
               </div>
             )}
-
+          </div>
         </div>
       )}
+    </>)}
 
-      {toastMsg && (
+    {toastMsg && (
         <div style={{ position: 'fixed', bottom: '20px', right: '20px', backgroundColor: toastMsg.type === 'success' ? 'var(--success)' : 'var(--error)', color: 'white', padding: '15px 25px', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} className="fade-in">
           {toastMsg.type === 'success' ? '✅' : '❌'} {toastMsg.text}
         </div>
