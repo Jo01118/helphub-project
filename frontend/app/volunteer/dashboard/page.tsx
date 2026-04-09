@@ -133,18 +133,17 @@ export default function VolunteerDashboard() {
       setReports(data);
       sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(data));
 
-      // Resolve location names lazily in background
-      data.forEach(async (r: any, idx: number) => {
+      // Resolve location names lazily in background with one update
+      const updatedData = [...data];
+      const promises = data.map(async (r: any, idx: number) => {
          if (!r.location_name) {
            const name = await getLocationName(r.latitude, r.longitude);
-           setReports(prev => {
-             const updated = [...prev];
-             if (updated[idx] && updated[idx].id === r.id) {
-               updated[idx] = { ...updated[idx], location_name: name };
-             }
-             return updated;
-           });
+           updatedData[idx] = { ...updatedData[idx], location_name: name };
          }
+      });
+      Promise.all(promises).then(() => {
+        setReports(updatedData);
+        sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(updatedData));
       });
       
     } catch (err: any) {

@@ -89,18 +89,17 @@ export default function AdminDashboard() {
       setReports(data);
       sessionStorage.setItem('admin_reports_cache', JSON.stringify(data));
       
-      // Background geocoding
-      data.forEach(async (r: any, idx: number) => {
+      // Background geocoding with batched update
+      const updatedData = [...data];
+      const promises = data.map(async (r: any, idx: number) => {
         if (!r.location_name) {
           const name = await getLocationName(r.latitude, r.longitude);
-          setReports(prev => {
-            const updated = [...prev];
-            if (updated[idx] && updated[idx].id === r.id) {
-              updated[idx] = { ...updated[idx], location_name: name };
-            }
-            return updated;
-          });
+          updatedData[idx] = { ...updatedData[idx], location_name: name };
         }
+      });
+      Promise.all(promises).then(() => {
+        setReports(updatedData);
+        sessionStorage.setItem('admin_reports_cache', JSON.stringify(updatedData));
       });
     } catch (err) {
       console.error(err);
