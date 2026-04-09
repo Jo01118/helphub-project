@@ -388,8 +388,8 @@ export default function AdminDashboard() {
                       const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
                       const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
 
-                      const category = categoryMatch ? categoryMatch[1].trim() : '';
-                      const issue = issueMatch ? issueMatch[1].trim() : '';
+                      const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
+                      const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
                       const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
                       const manualPart = manualMatch ? manualMatch[1].trim() : '';
                       
@@ -398,19 +398,17 @@ export default function AdminDashboard() {
                           <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
                             <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
                               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Category</span>
-                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{category || 'General'}</strong>
+                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{category || 'not provided'}</strong>
                             </div>
                             <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--success)' }}>
                               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Issue Type</span>
-                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{issue || 'Not Specified'}</strong>
+                              <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{issue || 'not provided'}</strong>
                             </div>
                           </div>
-                          {voicePart && (
-                            <div style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '5px' }}>
-                              <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice Transcript:</strong>
-                              <p style={{ margin: 0, fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{voicePart}</p>
-                            </div>
-                          )}
+                          <div style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }}>
+                            <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice Transcript:</strong>
+                            <p style={{ margin: 0, fontSize: '0.95rem', whiteSpace: 'pre-wrap', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
+                          </div>
 
                           {report.original_audio && (
                             <div style={{ marginBottom: '10px' }}>
@@ -428,7 +426,13 @@ export default function AdminDashboard() {
                       );
                     })()}
                     
-                    {report.photo && <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />}
+                    {report.photo ? (
+                      <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report Image" style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '5px', marginBottom: '10px' }} />
+                    ) : (
+                      <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px dashed var(--border)', textAlign: 'center', marginBottom: '10px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        🖼️ No photo provided
+                      </div>
+                    )}
                     
                     {(report.contact_info || report.user_details?.email || report.user_details?.username) && (
                       <div style={{ backgroundColor: 'rgba(0,0,0,0.05)', padding: '5px 10px', marginTop: '10px', borderRadius: '4px', fontSize: '0.85rem' }}>
@@ -622,7 +626,7 @@ export default function AdminDashboard() {
                                 {voicePart && (
                                   <div style={{ marginBottom: '10px', backgroundColor: 'var(--surface)', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }}>
                                     <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice Transcript:</strong>
-                                    <p style={{ margin: 0, fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{voicePart}</p>
+                                    <p style={{ margin: 0, fontSize: '0.95rem', whiteSpace: 'pre-wrap', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
                                   </div>
                                 )}
 

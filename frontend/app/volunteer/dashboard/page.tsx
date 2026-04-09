@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
-import { request, requestFormData } from '../../utils/api';
+import { request, requestFormData, BASE_URL } from '../../utils/api';
 import { getLocationName, searchLocationCoords } from '../../utils/geocoding';
 
 export default function VolunteerDashboard() {
@@ -400,7 +400,52 @@ export default function VolunteerDashboard() {
                         {report.status}
                       </span>
                     </div>
-                    <p style={{ marginBottom: '15px' }}><strong>Issue:</strong> {report.text}</p>
+                    
+                    <div style={{ marginBottom: '15px' }}>
+                      {(() => {
+                        const textRaw = report.text || '';
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+
+                        const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
+                        const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
+                        const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
+                        const manualPart = manualMatch ? manualMatch[1].trim() : '';
+
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--primary)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Category</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{category || 'not provided'}</strong>
+                              </div>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--success)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Issue Type</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
+                              </div>
+                            </div>
+                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
+                            </div>
+                            <div>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>📝 Description:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: manualPart ? 'var(--text-main)' : 'var(--text-muted)' }}>{manualPart || 'not provided'}</p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    
+                    {report.photo ? (
+                      <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '15px' }} />
+                    ) : (
+                      <div style={{ padding: '10px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px dashed var(--border)', textAlign: 'center', marginBottom: '3px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        🖼️ No photo provided
+                      </div>
+                    )}
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
                       <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
@@ -503,7 +548,46 @@ export default function VolunteerDashboard() {
                         </a>
                       </div>
                     </div>
-                    <p style={{ marginBottom: '15px' }}><strong>Issue:</strong> {report.text}</p>
+                    <div style={{ marginBottom: '15px' }}>
+                      {(() => {
+                        const textRaw = report.text || '';
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+
+                        const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
+                        const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
+                        const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
+                        const manualPart = manualMatch ? manualMatch[1].trim() : '';
+
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--primary)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Category</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{category || 'not provided'}</strong>
+                              </div>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--success)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Issue Type</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
+                              </div>
+                            </div>
+                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    {report.photo ? (
+                      <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '15px' }} />
+                    ) : (
+                      <div style={{ padding: '10px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px dashed var(--border)', textAlign: 'center', marginBottom: '15px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        🖼️ No photo provided
+                      </div>
+                    )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px' }}>
                       <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '5px' }}>Your Location</p>
@@ -542,7 +626,39 @@ export default function VolunteerDashboard() {
                         {req.status}
                       </span>
                     </div>
-                    <p style={{ marginBottom: '15px' }}><strong>Issue:</strong> {req.report_details?.text}</p>
+                    <div style={{ marginBottom: '15px' }}>
+                      {(() => {
+                        const textRaw = req.report_details?.text || '';
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+
+                        const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
+                        const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
+                        const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
+                        const manualPart = manualMatch ? manualMatch[1].trim() : '';
+
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--primary)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Category</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{category || 'not provided'}</strong>
+                              </div>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--success)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Issue Type</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
+                              </div>
+                            </div>
+                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                     <div style={{ backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                        <strong style={{ display: 'block', fontSize: '1rem', color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>🚨 {req.report_details?.location_name || 'Location'}</strong>
                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '5px' }}>{req.report_details?.latitude?.toFixed(4)}, {req.report_details?.longitude?.toFixed(4)}</div>

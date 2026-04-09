@@ -128,19 +128,24 @@ export default function UserDashboard() {
   };
 
   const fetchMyReports = async () => {
+    // Check session cache for quick return
+    const cached = sessionStorage.getItem('user_reports_cache');
+    if (cached) {
+      setReports(JSON.parse(cached));
+    }
+
     setLoadingReports(true);
     try {
-      // The backend API handles filtering by user due to authentication context!
       const data = await request('/reports/');
-      // We will use the location_name stored in the database for speed
       setReports(data);
+      sessionStorage.setItem('user_reports_cache', JSON.stringify(data));
     } catch (err: any) {
       console.error('Failed to fetch reports:', err);
       if (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out')) {
         localStorage.removeItem('access');
         localStorage.removeItem('refresh');
         localStorage.removeItem('userRole');
-        window.location.href = '/user'; // Token likely expired
+        window.location.href = '/user'; 
       }
     } finally {
       setLoadingReports(false);
@@ -507,33 +512,43 @@ export default function UserDashboard() {
                       </div>
                     )}
 
-                    {(() => {
-                      const textParts = report.text ? report.text.split('[Text]:') : ['', ''];
-                      const voicePart = textParts[0];
-                      const manualPart = textParts.length > 1 ? '[Text]:' + textParts[1] : '';
+                    <div style={{ marginBottom: '15px' }}>
+                      {(() => {
+                        const textRaw = report.text || '';
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
 
-                      return (
-                        <>
-                          {voicePart.trim() && (
-                            <div style={{ whiteSpace: 'pre-wrap', marginBottom: '10px' }}>
-                              {voicePart.trim()}
-                            </div>
-                          )}
+                        const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
+                        const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
+                        const voicePart = voiceMatch ? voiceMatch[1].trim() : '';
+                        const manualPart = manualMatch ? manualMatch[1].trim() : '';
 
-                          {report.original_audio && (
-                            <div style={{ marginBottom: '15px' }}>
-                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%' }} />
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(52, 152, 219, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--primary)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Category</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{category || 'not provided'}</strong>
+                              </div>
+                              <div style={{ flex: 1, backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid var(--success)' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Issue Type</span>
+                                <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
+                              </div>
                             </div>
-                          )}
-
-                          {manualPart.trim() && (
-                            <div style={{ whiteSpace: 'pre-wrap', marginBottom: '10px' }}>
-                              {manualPart.trim()}
+                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
                             </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                            <div>
+                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>📝 Description:</strong>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: manualPart ? 'var(--text-main)' : 'var(--text-muted)' }}>{manualPart || 'not provided'}</p>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                     
                     <div style={{ backgroundColor: 'rgba(56, 189, 248, 0.05)', padding: '10px', borderRadius: '8px', marginTop: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
                       <strong style={{ fontSize: '1.1rem', color: 'var(--primary)' }}>📍 {report.location_name || 'Geocoding...'}</strong>
@@ -546,8 +561,12 @@ export default function UserDashboard() {
                       <span style={{ fontSize: '0.85rem' }}>Lat: {report.latitude?.toFixed(6)}, Lng: {report.longitude?.toFixed(6)}</span>
                     </div>
                     
-                    {report.photo && (
+                    {report.photo ? (
                        <img src={report.photo.startsWith('http') || report.photo.startsWith('data:') ? report.photo : `${BASE_URL}${report.photo}`} alt="Report Photo" style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '8px', marginTop: '15px' }} />
+                    ) : (
+                      <div style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px dashed var(--border)', textAlign: 'center', marginTop: '15px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        🖼️ No photo provided
+                      </div>
                     )}
 
                     {report.resolved_proof && (
