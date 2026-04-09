@@ -297,7 +297,7 @@ export default function UserDashboard() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <h1 style={{ color: 'var(--primary)', fontSize: '1.25rem', fontWeight: 600 }}>{mounted ? t('user_dashboard') : 'User Dashboard'}</h1>
+        <h1 style={{ color: 'var(--primary)', fontSize: '1.25rem', fontWeight: 600 }}>{t('user_dashboard')}</h1>
         <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem' }}>
           {t('logout')}
         </button>
@@ -308,7 +308,7 @@ export default function UserDashboard() {
       <div style={{ padding: '1rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
         <div style={{ width: '100%', maxWidth: '800px' }}>
           {!mounted ? (
-            <div style={{ textAlign: 'center', color: 'var(--primary)', marginTop: '2rem' }}>Loading Dashboard...</div>
+            <div style={{ textAlign: 'center', color: 'var(--primary)', marginTop: '2rem' }}>{t('loading_dashboard')}</div>
           ) : (
             <>
               {activeTab === 'report' && (
@@ -319,10 +319,10 @@ export default function UserDashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <span style={{ fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold', display: 'block', margin: '5px 0' }}>
-                        📍 Confirmed: {locName}
+                        {t('confirmed')}: {locName}
                       </span>
                       <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>
-                        Coordinates: {location?.lat?.toFixed(6)}, {location?.lng?.toFixed(6)}
+                        {t('confirmed_coords')}: {location?.lat?.toFixed(6)}, {location?.lng?.toFixed(6)}
                       </span>
                     </div>
                     <button 
@@ -330,7 +330,7 @@ export default function UserDashboard() {
                       onClick={() => setIsLocationConfirmed(false)} 
                       style={{ padding: '8px 15px', backgroundColor: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                     >
-                      ✏️ Re-enter location
+                      {t('re_enter_location')}
                     </button>
                   </div>
                 ) : (
@@ -487,7 +487,7 @@ export default function UserDashboard() {
                  <div style={{ textAlign: 'center', color: 'var(--primary)' }}>Loading your reports securely from the server...</div>
               ) : reports.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                  {t('no_reports_yet') || 'No reports submitted yet.'}
+                  {t('no_reports_yet')}
                 </div>
               ) : (
                 reports.map((report) => (
@@ -502,7 +502,7 @@ export default function UserDashboard() {
                     
                     {report.admin_message && (
                       <div style={{ backgroundColor: 'rgba(255, 193, 7, 0.15)', borderLeft: '4px solid #f1c40f', padding: '10px 15px', marginBottom: '15px', borderRadius: '4px' }}>
-                        <strong style={{ color: '#d35400' }}>Admin Reply:</strong>
+                        <strong style={{ color: '#d35400' }}>{t('admin_reply')}:</strong>
                         <p style={{ margin: '5px 0 0 0', color: 'var(--text-main)', fontSize: '0.95rem' }}>{report.admin_message}</p>
                       </div>
                     )}

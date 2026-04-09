@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
+import { useLanguage } from '../app/context/LanguageContext';
+
 export default function Navigation() {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -79,38 +82,38 @@ export default function Navigation() {
 
   // Default links
   let navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Login / Register', href: '/access' },
-    { name: 'Help / Chat', href: '/help' },
-    { name: 'Anonymous Report', href: '/anonymous' },
+    { name: t('home'), href: '/' },
+    { name: t('login_register'), href: '/access' },
+    { name: t('help_chat'), href: '/help' },
+    { name: t('anonymous_report_nav'), href: '/anonymous' },
   ];
 
   if (pathname.startsWith('/user/dashboard')) {
     navLinks = [
-      { name: 'Home', href: '/' },
-      { name: 'Report an Issue', href: '#report' },
-      { name: 'My Reports', href: '#my_reports' },
-      { name: 'My Profile', href: '#profile' },
-      { name: 'Help / Chat', href: '/help' },
-      { name: '🚨 Emergency Call', href: 'tel:112' },
-      { name: 'Logout', href: '#logout' }
+      { name: t('home'), href: '/' },
+      { name: t('report_an_issue_nav'), href: '#report' },
+      { name: t('my_reports'), href: '#my_reports' },
+      { name: t('my_profile'), href: '#profile' },
+      { name: t('help_chat'), href: '/help' },
+      { name: t('emergency_call_nav'), href: 'tel:112' },
+      { name: t('logout'), href: '#logout' }
     ];
   } else if (pathname.startsWith('/volunteer/dashboard')) {
     navLinks = [
-      { name: 'Home', href: '/' },
-      { name: 'Assigned Issues', href: '#assigned' },
-      { name: 'Nearby Unassigned', href: '#nearby' },
-      { name: 'Requested Assignments', href: '#requests' },
-      { name: 'My Profile', href: '#profile' },
-      { name: 'Logout', href: '#logout' }
+      { name: t('home'), href: '/' },
+      { name: t('assigned_issues'), href: '#assigned' },
+      { name: t('nearby_unassigned'), href: '#nearby' },
+      { name: t('requested_assignments'), href: '#requests' },
+      { name: t('my_profile'), href: '#profile' },
+      { name: t('logout'), href: '#logout' }
     ];
   } else if (pathname.startsWith('/admin')) {
     navLinks = [
-      { name: 'Home', href: '/' },
-      { name: 'Issue Management', href: '#reports' },
-      { name: 'Volunteers', href: '#volunteers' },
-      { name: 'Assignment Requests', href: '#requests' },
-      { name: 'Logout', href: '#logout' }
+      { name: t('home'), href: '/' },
+      { name: t('issue_management'), href: '#reports' },
+      { name: t('volunteers'), href: '#volunteers' },
+      { name: t('assignment_requests'), href: '#requests' },
+      { name: t('logout'), href: '#logout' }
     ];
   }
 

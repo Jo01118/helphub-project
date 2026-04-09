@@ -266,7 +266,7 @@ export default function VolunteerDashboard() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
       {/* Header */}
       <header style={{ backgroundColor: 'var(--surface)', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <h1 style={{ color: 'var(--secondary)', fontSize: '1.25rem', fontWeight: 600 }}>Volunteer Dashboard</h1>
+        <h1 style={{ color: 'var(--secondary)', fontSize: '1.25rem', fontWeight: 600 }}>{t('vol_dashboard_title')}</h1>
         <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', border: '1px solid var(--error)', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem' }}>
           {t('logout')}
         </button>
@@ -276,17 +276,17 @@ export default function VolunteerDashboard() {
       {showSetupModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
           <div className="glass-card" style={{ width: '100%', maxWidth: '400px', backgroundColor: 'var(--surface)', borderTop: '5px solid var(--secondary)' }}>
-            <h2 style={{ textAlign: 'center', color: 'var(--secondary)', marginBottom: '1rem' }}>Welcome to HelpHub! 🎉</h2>
+            <h2 style={{ textAlign: 'center', color: 'var(--secondary)', marginBottom: '1rem' }}>{t('welcome_helphub')}</h2>
             <p style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-              Since this is your first time logging in as an approved volunteer, please set up your permanent username and password.
+              {t('setup_credentials_help')}
             </p>
             {setupError && <div style={{ color: 'white', backgroundColor: 'var(--error)', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>{setupError}</div>}
             
             <form onSubmit={handleSetupAccount}>
-              <input type="text" placeholder="Choose a Username" required value={newUsername} onChange={e => setNewUsername(e.target.value)} />
-              <input type="password" placeholder="Choose a Password" required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+              <input type="text" placeholder={t('username_placeholder')} required value={newUsername} onChange={e => setNewUsername(e.target.value)} />
+              <input type="password" placeholder={t('password_placeholder')} required value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={setupLoading}>
-                {setupLoading ? 'Saving...' : 'Save & Continue'}
+                {setupLoading ? t('saving') : t('save_continue')}
               </button>
             </form>
           </div>
@@ -297,7 +297,7 @@ export default function VolunteerDashboard() {
       <div style={{ padding: '1rem 1rem 0 1rem', display: 'flex', justifyContent: 'center' }}>
         <div style={{ width: '100%', maxWidth: '800px' }}>
           <div className="glass-card fade-in" style={{ marginBottom: isLocationConfirmed ? '1rem' : '2rem' }}>
-            <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>📍 {isLocationConfirmed ? 'Active Navigation Point' : 'Step 1: Confirm Your Location'}</h2>
+            <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>📍 {isLocationConfirmed ? t('active_nav_point') : t('step_1_confirm_loc')}</h2>
             
             {isLocationConfirmed ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid var(--success)' }}>
@@ -324,7 +324,7 @@ export default function VolunteerDashboard() {
                     type="text" 
                     value={searchQuery} 
                     onChange={e => setSearchQuery(e.target.value)} 
-                    placeholder="Search city/area manually (e.g. Tirupati)"
+                    placeholder={t('search_location_volunteer')}
                     style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}
                   />
                   <button 
@@ -346,7 +346,7 @@ export default function VolunteerDashboard() {
                     disabled={isSearching}
                     style={{ padding: '0 20px', borderRadius: '6px' }}
                   >
-                    {isSearching ? '...' : 'Search'}
+                    {isSearching ? '...' : t('search_button')}
                   </button>
                 </div>
 
@@ -435,7 +435,7 @@ export default function VolunteerDashboard() {
                         if (report.contact_shared) {
                            return (
                              <div style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '15px', borderRadius: '8px', marginBottom: '15px', border: '1px solid var(--success)' }}>
-                               <strong style={{ display: 'block', color: 'var(--success)', marginBottom: '5px' }}>📞 User Contact Information:</strong>
+                               <strong style={{ display: 'block', color: 'var(--success)', marginBottom: '5px' }}>{t('user_contact_info')}</strong>
                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{contactString}</span>
                              </div>
                            );
@@ -444,16 +444,16 @@ export default function VolunteerDashboard() {
                              <div style={{ marginBottom: '15px', backgroundColor: 'rgba(52, 152, 219, 0.05)', padding: '15px', borderRadius: '8px', border: '1px solid var(--primary)' }}>
                                {report.contact_request_reason ? (
                                   <div>
-                                    <strong style={{ display: 'block', color: 'var(--primary)', marginBottom: '5px' }}>📞 Contact Info Requested</strong>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Pending admin approval. Reason sent: "{report.contact_request_reason}"</span>
+                                    <strong style={{ display: 'block', color: 'var(--primary)', marginBottom: '5px' }}>{t('contact_info_requested')}</strong>
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t('pending_admin_approval')} Reason: "{report.contact_request_reason}"</span>
                                   </div>
                                ) : requestContactId === report.id ? (
                                   <form onSubmit={handleRequestContact} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                    <label style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>Why do you need the user's contact information?</label>
-                                    <textarea rows={2} required value={contactReasonText} onChange={e => setContactReasonText(e.target.value)} placeholder="e.g., Cannot find the exact location, need to call them." style={{ padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }} />
+                                    <label style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{t('contact_reason_label')}</label>
+                                    <textarea rows={2} required value={contactReasonText} onChange={e => setContactReasonText(e.target.value)} placeholder={t('contact_reason_placeholder')} style={{ padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }} />
                                     <div style={{ display: 'flex', gap: '10px' }}>
-                                      <button type="submit" className="btn-primary" style={{ flex: 1 }}>Submit Request to Admin</button>
-                                      <button type="button" onClick={() => { setRequestContactId(null); setContactReasonText(''); }} className="btn-primary" style={{ backgroundColor: 'var(--error)' }}>Cancel</button>
+                                      <button type="submit" className="btn-primary" style={{ flex: 1 }}>{t('submit_request_admin')}</button>
+                                      <button type="button" onClick={() => { setRequestContactId(null); setContactReasonText(''); }} className="btn-primary" style={{ backgroundColor: 'var(--error)' }}>{t('cancel')}</button>
                                     </div>
                                   </form>
                                ) : (
@@ -461,26 +461,27 @@ export default function VolunteerDashboard() {
                                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
                                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'var(--surface)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
                                      onClick={() => setRequestContactId(report.id)}>
-                                     📞 Request User Contact Info
+                                     {t('request_user_contact')}
                                    </button>
                                )}
                              </div>
                            )
                         }
                     })()}
+
                     {resolvingId === report.id ? (
                       <form onSubmit={handleResolve} className="fade-in" style={{ marginTop: '15px', backgroundColor: 'rgba(46, 204, 113, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid var(--success)' }}>
-                        <p style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--success)' }}>Finalizing Resolution</p>
-                        <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: 'var(--text-main)' }}>Upload Picture or Video Proof (Requested by Admin)</label>
+                        <p style={{ fontWeight: 'bold', marginBottom: '10px', color: 'var(--success)' }}>{t('finalizing_resolution')}</p>
+                        <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: 'var(--text-main)' }}>{t('upload_proof_help')}</label>
                         <input type="file" accept="image/*,video/*" onChange={e => { if(e.target.files) setResolveProof(e.target.files[0])}} style={{ marginBottom: '15px', width: '100%' }} />
                         <div style={{ display: 'flex', gap: '10px' }}>
-                          <button type="submit" className="btn-primary" style={{ flex: 1, backgroundColor: 'var(--success)' }}>✅ Upload & Resolve</button>
-                          <button type="button" onClick={() => { setResolvingId(null); setResolveProof(null); }} className="btn-primary" style={{ backgroundColor: 'var(--error)' }}>Cancel</button>
+                          <button type="submit" className="btn-primary" style={{ flex: 1, backgroundColor: 'var(--success)' }}>{t('upload_resolve')}</button>
+                          <button type="button" onClick={() => { setResolvingId(null); setResolveProof(null); }} className="btn-primary" style={{ backgroundColor: 'var(--error)' }}>{t('cancel')}</button>
                         </div>
                       </form>
                     ) : (
                       <button className="btn-primary" style={{ width: '100%', backgroundColor: 'var(--success)' }} onClick={() => setResolvingId(report.id)}>
-                        ✅ Mark as Resolved (Attach Proof)
+                        {t('mark_resolved')}
                       </button>
                     )}
                   </div>
@@ -639,10 +640,7 @@ export default function VolunteerDashboard() {
               </div>
             )}
 
-          </div>
         </div>
-      )}
-      </>
       )}
 
       {toastMsg && (

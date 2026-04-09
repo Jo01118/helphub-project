@@ -29,43 +29,66 @@ Keep answers concise and helpful in plain text.`;
       parts: [{ text: msg.text }],
     })) : [];
 
-    // Use the stable gemini-1.5-flash model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+    // Optimized multi-model fallback: using Lite models first for fastest response times
+    const modelsToTry = [
+      "gemini-2.0-flash-lite",
+      "gemini-flash-lite-latest",
+      "gemini-2.0-flash",
+      "gemini-flash-latest"
+    ];
 
-    let result;
-    let retries = 3;
-    while (retries > 0) {
+    let responseText = "";
+    let lastError = null;
+
+    for (const modelName of modelsToTry) {
       try {
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          systemInstruction: systemPrompt 
+        });
+
         const chat = model.startChat({
           history: formattedHistory,
           generationConfig: {
-            maxOutputTokens: 1000,
+            maxOutputTokens: 500,
           },
         });
 
-        result = await chat.sendMessage(message);
-        break; // Success
-      } catch (err: any) {
-        if ((err.message?.includes('503') || err.message?.includes('429')) && retries > 1) {
-          retries--;
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          continue;
+        // Use AbortController for a 7-second timeout to ensure fast failover
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+        try {
+          // Pass the signal to ensure we stop waiting for slow models
+          const result = await chat.sendMessage(message, { signal: controller.signal });
+          responseText = result.response.text();
+          clearTimeout(timeoutId);
+          if (responseText) break;
+        } catch (innerErr: any) {
+          clearTimeout(timeoutId);
+          throw innerErr;
         }
-        throw err;
+      } catch (err: any) {
+        console.warn(`Model ${modelName} failed or timed out:`, err.message);
+        lastError = err;
+        continue; // Try the next model immediately
       }
     }
 
-    if (!result) throw new Error("Failed to get response after retries");
-
-    const responseText = result.response.text();
+    if (!responseText) {
+      // Friendly fallback instead of technical error
+      return NextResponse.json({ 
+        text: "Hello! Our AI assistant is currently resting after a busy day. 🤖\n\nI'm temporarily unavailable, but I'll be back soon! In the meantime, you can check our Support FAQ above or reach out to us directly at helphubreporting.team@gmail.com for urgent assistance. Thank you for your patience!" 
+      });
+    }
 
     return NextResponse.json({ text: responseText });
 
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
+    console.error("Critical Chat API Error:", error);
     return NextResponse.json(
-      { text: `System Error: ${error.message || 'Unknown Error'}. Please ensure your API key is valid.` },
-      { status: 500 }
+      { text: "Hello! I am currently taking a quick break to recharge my circuits. ⚡ Please try messaging me again in a few minutes!" },
+      { status: 200 } // Return 200 so the UI doesn't crash
     );
   }
 }
