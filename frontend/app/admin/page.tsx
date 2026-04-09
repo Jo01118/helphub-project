@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../context/LanguageContext';
 import { request, BASE_URL } from '../utils/api';
 import { getLocationName } from '../utils/geocoding';
 
 export default function AdminDashboard() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeTab, setActiveTab] = useState<'reports' | 'volunteers' | 'stats' | 'requests'>('reports');
@@ -20,6 +22,8 @@ export default function AdminDashboard() {
   const [reports, setReports] = useState<any[]>([]);
   const [volunteers, setVolunteers] = useState<any[]>([]);
   const [assignmentRequests, setAssignmentRequests] = useState<any[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+  const [loadingVolunteers, setLoadingVolunteers] = useState(false);
 
   // Filters
   const [filterStatus, setFilterStatus] = useState('ALL');
@@ -30,10 +34,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Check local storage for quick bypass in same session
-    if (localStorage.getItem('admin_access')) {
-      setIsAuthenticated(true);
-      fetchAdminData();
+    if (!localStorage.getItem('admin_access')) {
+      router.push('/');
+      return;
     }
+    setIsAuthenticated(true);
+    fetchAdminData();
     setIsCheckingAuth(false);
 
     const handleHash = () => {
@@ -68,8 +74,56 @@ export default function AdminDashboard() {
     localStorage.removeItem('admin_access');
     localStorage.removeItem('access');
     localStorage.removeItem('userRole');
+    sessionStorage.removeItem('admin_reports_cache');
+    sessionStorage.removeItem('admin_volunteers_cache');
     window.location.href = '/access';
   }
+
+  const fetchReports = async () => {
+    const cached = sessionStorage.getItem('admin_reports_cache');
+    if (cached) setReports(JSON.parse(cached));
+    
+    setLoadingReports(true);
+    try {
+      const data = await request('/reports/');
+      setReports(data);
+      sessionStorage.setItem('admin_reports_cache', JSON.stringify(data));
+      
+      // Background geocoding
+      data.forEach(async (r: any, idx: number) => {
+        if (!r.location_name) {
+          const name = await getLocationName(r.latitude, r.longitude);
+          setReports(prev => {
+            const updated = [...prev];
+            if (updated[idx] && updated[idx].id === r.id) {
+              updated[idx] = { ...updated[idx], location_name: name };
+            }
+            return updated;
+          });
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingReports(false);
+    }
+  };
+
+  const fetchVolunteers = async () => {
+    const cached = sessionStorage.getItem('admin_volunteers_cache');
+    if (cached) setVolunteers(JSON.parse(cached));
+
+    setLoadingVolunteers(true);
+    try {
+      const data = await request('/auth/volunteers/applicants/');
+      setVolunteers(data);
+      sessionStorage.setItem('admin_volunteers_cache', JSON.stringify(data));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingVolunteers(false);
+    }
+  };
 
   const fetchAdminData = async () => {
     setIsRefreshing(true);
@@ -78,15 +132,8 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('admin_access');
       localStorage.setItem('access', token || '');
 
-      const repData = await request('/reports/');
-      const enhancedReports = await Promise.all(repData.map(async (r: any) => {
-         const name = await getLocationName(r.latitude, r.longitude);
-         return { ...r, location_name: name };
-      }));
-      setReports(enhancedReports);
-
-      const volData = await request('/volunteers/');
-      setVolunteers(volData);
+      await fetchReports();
+      await fetchVolunteers();
 
       const reqData = await request('/assignment-requests/');
       setAssignmentRequests(reqData.filter((r:any) => r.status === 'PENDING'));

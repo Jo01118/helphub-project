@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../context/LanguageContext';
 import { request, requestFormData, BASE_URL } from '../../utils/api';
 import { getLocationName, searchLocationCoords } from '../../utils/geocoding';
@@ -8,6 +9,7 @@ import { getIssueSuggestions } from '../../utils/aiSuggestions';
 
 export default function UserDashboard() {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<'report' | 'my_reports' | 'profile'>('report');
   
@@ -75,7 +77,7 @@ export default function UserDashboard() {
     try {
       // Check if token exists, else redirect
       if (!localStorage.getItem('access')) {
-        window.location.href = '/user';
+        router.push('/user');
         return;
       }
 
@@ -145,7 +147,7 @@ export default function UserDashboard() {
         localStorage.removeItem('access');
         localStorage.removeItem('refresh');
         localStorage.removeItem('userRole');
-        window.location.href = '/user'; 
+        router.push('/user'); 
       }
     } finally {
       setLoadingReports(false);
@@ -270,8 +272,8 @@ export default function UserDashboard() {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     localStorage.removeItem('userRole');
-    window.location.href = '/';
-  }
+    router.push('/user');
+  };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../context/LanguageContext';
 import { request, requestFormData, BASE_URL } from '../../utils/api';
 import { getLocationName, searchLocationCoords } from '../../utils/geocoding';
 
 export default function VolunteerDashboard() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'assigned' | 'nearby' | 'profile' | 'requests'>('assigned');
   const [assignmentRequests, setAssignmentRequests] = useState<any[]>([]);
   
@@ -45,7 +47,7 @@ export default function VolunteerDashboard() {
 
   useEffect(() => {
     if (!localStorage.getItem('access')) {
-      window.location.href = '/volunteer';
+      router.push('/volunteer');
       return;
     }
 
@@ -118,32 +120,40 @@ export default function VolunteerDashboard() {
   };
 
   const fetchReports = async () => {
+    // Check session cache for instant load
+    const cached = sessionStorage.getItem('volunteer_reports_cache');
+    if (cached) {
+      setReports(JSON.parse(cached));
+    }
+
     setLoadingReports(true);
     try {
       const data = await request('/reports/');
-      const enhancedData = await Promise.all(data.map(async (r: any) => {
-         const name = await getLocationName(r.latitude, r.longitude);
-         // simple straight-line distance heuristic (not highly accurate but serves the UI logic)
-         const deg2rad = (deg: number) => deg * (Math.PI/180);
-         const R = 6371; // Radius of the earth in km
-         const currentLat = volLat || 17.3850;
-         const currentLng = volLng || 78.4867;
-         const dLat = deg2rad(r.latitude - currentLat);
-         const dLon = deg2rad(r.longitude - currentLng); 
-         const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(currentLat)) * Math.cos(deg2rad(r.latitude)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-         const distance = R * c; 
-         
-         return { ...r, location_name: name, distance: distance };
-      }));
-      setReports(enhancedData);
+      // Set results immediately without waiting for geocoding
+      setReports(data);
+      sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(data));
+
+      // Resolve location names lazily in background
+      data.forEach(async (r: any, idx: number) => {
+         if (!r.location_name) {
+           const name = await getLocationName(r.latitude, r.longitude);
+           setReports(prev => {
+             const updated = [...prev];
+             if (updated[idx] && updated[idx].id === r.id) {
+               updated[idx] = { ...updated[idx], location_name: name };
+             }
+             return updated;
+           });
+         }
+      });
+      
     } catch (err: any) {
       console.error(err);
       if (err.message && (err.message.includes('token') || err.message.includes('credentials') || err.message.includes('Time out'))) {
         localStorage.removeItem('access');
         localStorage.removeItem('refresh');
         localStorage.removeItem('userRole');
-        window.location.href = '/volunteer';
+        router.push('/volunteer');
       }
     } finally {
       setLoadingReports(false);

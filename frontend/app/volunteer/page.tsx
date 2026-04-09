@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../context/LanguageContext';
 import { request, requestFormData } from '../utils/api';
 import { searchLocationCoords } from '../utils/geocoding';
 
 export default function VolunteerPortal() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [mode, setMode] = useState<'apply' | 'login' | 'status' | 'forgot'>('apply');
 
@@ -74,16 +76,6 @@ export default function VolunteerPortal() {
     }
   };
 
-  // Auto-redirect valid sessions to dashboard
-  useEffect(() => {
-    const token = localStorage.getItem('access');
-    const role = localStorage.getItem('userRole');
-    if (token && role === 'VOLUNTEER') {
-      window.location.href = '/volunteer/dashboard';
-    } else {
-      setIsCheckingAuth(false);
-    }
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +105,7 @@ export default function VolunteerPortal() {
         localStorage.setItem('access', data.access);
         if (data.refresh) localStorage.setItem('refresh', data.refresh);
         localStorage.setItem('userRole', 'VOLUNTEER');
-        window.location.href = '/volunteer/dashboard';
+        router.push('/volunteer/dashboard');
       } else {
         // Registration (Apply without password)
         const formData = new FormData();
@@ -169,7 +161,7 @@ export default function VolunteerPortal() {
                  localStorage.setItem('access', approvedData.access);
                  if (approvedData.refresh) localStorage.setItem('refresh', approvedData.refresh);
                  localStorage.setItem('userRole', 'VOLUNTEER');
-                 window.location.href = '/volunteer/dashboard';
+                 router.push('/volunteer/dashboard');
               }}
             >
               Proceed to Dashboard
@@ -315,7 +307,7 @@ export default function VolunteerPortal() {
                           localStorage.setItem('access', approvedData.access);
                           if (approvedData.refresh) localStorage.setItem('refresh', approvedData.refresh);
                           localStorage.setItem('userRole', 'VOLUNTEER');
-                          window.location.href = '/volunteer/dashboard';
+                          router.push('/volunteer/dashboard');
                        } catch (err: any) {
                           setErrorMsg(err.message || "Failed to set credentials.");
                        } finally { setLoading(false); }
