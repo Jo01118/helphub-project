@@ -406,7 +406,7 @@ export default function VolunteerDashboard() {
         <>
           {/* Tabs removed for global hamburger nav */}
 
-      {loadingReports ? (
+      {loadingReports && reports.length === 0 ? (
         <div style={{ padding: '2rem', textAlign: 'center' }}>Loading tasks securely...</div>
       ) : (
         <div style={{ padding: '1rem', flex: 1, display: 'flex', justifyContent: 'center' }}>
@@ -427,10 +427,10 @@ export default function VolunteerDashboard() {
                     <div style={{ marginBottom: '15px' }}>
                       {(() => {
                         const textRaw = report.text || '';
-                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
-                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
-                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
-                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?:\r?\n\r?\n|\[Text\]:|$)/i);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?:\r?\n\[Location Info\]:|$)/i);
 
                         const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
                         const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
@@ -574,10 +574,10 @@ export default function VolunteerDashboard() {
                     <div style={{ marginBottom: '15px' }}>
                       {(() => {
                         const textRaw = report.text || '';
-                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
-                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
-                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
-                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?:\r?\n\r?\n|\[Text\]:|$)/i);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?:\r?\n\[Location Info\]:|$)/i);
 
                         const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
                         const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
@@ -652,10 +652,10 @@ export default function VolunteerDashboard() {
                     <div style={{ marginBottom: '15px' }}>
                       {(() => {
                         const textRaw = req.report_details?.text || '';
-                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
-                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
-                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
-                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?:\r?\n\r?\n|\[Text\]:|$)/i);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?:\r?\n\[Location Info\]:|$)/i);
 
                         const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
                         const issue = issueMatch ? issueMatch[1].trim() : 'not provided';

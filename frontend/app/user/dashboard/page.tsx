@@ -490,7 +490,7 @@ export default function UserDashboard() {
           {activeTab === 'my_reports' && (
             <div className="fade-in">
               <h2 style={{ marginBottom: '1.5rem' }}>{t('my_reports')}</h2>
-              {loadingReports ? (
+              {loadingReports && reports.length === 0 ? (
                  <div style={{ textAlign: 'center', color: 'var(--primary)' }}>Loading your reports securely from the server...</div>
               ) : reports.length === 0 ? (
                 <div className="glass-card" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -517,10 +517,10 @@ export default function UserDashboard() {
                     <div style={{ marginBottom: '15px' }}>
                       {(() => {
                         const textRaw = report.text || '';
-                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?=\n|\[|$)/);
-                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?=\n|\[|$)/);
-                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?=\n\n|\[Text\]:|$)/);
-                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?=\n\[Location Info\]:|$)/);
+                        const categoryMatch = textRaw.match(/\[Category\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const issueMatch = textRaw.match(/\[Issue\]:\s*(.*?)(?:\r?\n|\[|$)/i);
+                        const voiceMatch = textRaw.match(/\[Voice\]:\s*([\s\S]*?)(?:\r?\n\r?\n|\[Text\]:|$)/i);
+                        const manualMatch = textRaw.match(/\[Text\]:\s*([\s\S]*?)(?:\r?\n\[Location Info\]:|$)/i);
 
                         const category = categoryMatch ? categoryMatch[1].trim() : 'not provided';
                         const issue = issueMatch ? issueMatch[1].trim() : 'not provided';
