@@ -147,18 +147,27 @@ export default function VolunteerDashboard() {
       setReports(resultsWithDistance);
       sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(resultsWithDistance));
 
-      // Resolve location names lazily in background
+      // Background geocoding with sequential update to respect rate limits
       const updatedData = [...resultsWithDistance];
-      const promises = resultsWithDistance.map(async (r: any, idx: number) => {
-         if (!r.location_name) {
-           const name = await getLocationName(r.latitude, r.longitude);
-           updatedData[idx] = { ...updatedData[idx], location_name: name };
-         }
-      });
-      Promise.all(promises).then(() => {
-        setReports(updatedData);
-        sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(updatedData));
-      });
+      const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+      
+      const processGeocoding = async () => {
+        for (let i = 0; i < resultsWithDistance.length; i++) {
+          const r = resultsWithDistance[i];
+          if (!r.location_name) {
+             try {
+               const name = await getLocationName(r.latitude, r.longitude);
+               updatedData[i] = { ...updatedData[i], location_name: name };
+               setReports([...updatedData]);
+               sessionStorage.setItem('volunteer_reports_cache', JSON.stringify(updatedData));
+               await delay(1000); // Wait 1 second between requests
+             } catch (geerr) {
+               console.warn("Geocoding individual report failed", geerr);
+             }
+          }
+        }
+      };
+      processGeocoding();
       
     } catch (err: any) {
       console.error(err);
@@ -449,10 +458,18 @@ export default function VolunteerDashboard() {
                                 <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
                               </div>
                             </div>
-                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
-                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
-                            </div>
+                            
+                            {(voicePart || report.original_audio || req.report_details?.original_audio) && (
+                              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice:</strong>
+                                {(report.original_audio || req.report_details?.original_audio) && (
+                                  <div style={{ marginTop: '5px' }}>
+                                    <audio src={(report.original_audio || req.report_details?.original_audio).startsWith('http') || (report.original_audio || req.report_details?.original_audio).startsWith('data:') ? (report.original_audio || req.report_details?.original_audio) : `${BASE_URL}${(report.original_audio || req.report_details?.original_audio)}`} controls style={{ width: '100%', height: '35px' }} />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
                             <div>
                               <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>📝 Description:</strong>
                               <p style={{ margin: 0, fontSize: '0.9rem', color: manualPart ? 'var(--text-main)' : 'var(--text-muted)' }}>{manualPart || 'not provided'}</p>
@@ -596,10 +613,16 @@ export default function VolunteerDashboard() {
                                 <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
                               </div>
                             </div>
-                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
-                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
-                            </div>
+                            {(voicePart || report.original_audio || req.report_details?.original_audio) && (
+                              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice:</strong>
+                                {(report.original_audio || req.report_details?.original_audio) && (
+                                  <div style={{ marginTop: '5px' }}>
+                                    <audio src={(report.original_audio || req.report_details?.original_audio).startsWith('http') || (report.original_audio || req.report_details?.original_audio).startsWith('data:') ? (report.original_audio || req.report_details?.original_audio) : `${BASE_URL}${(report.original_audio || req.report_details?.original_audio)}`} controls style={{ width: '100%', height: '35px' }} />
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         );
                       })()}
@@ -674,10 +697,16 @@ export default function VolunteerDashboard() {
                                 <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
                               </div>
                             </div>
-                            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                              <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice Transcript:</strong>
-                              <p style={{ margin: 0, fontSize: '0.9rem', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
-                            </div>
+                            {(voicePart || req.report_details?.original_audio) && (
+                              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice:</strong>
+                                {req.report_details?.original_audio && (
+                                  <div style={{ marginTop: '5px' }}>
+                                    <audio src={req.report_details.original_audio.startsWith('http') || req.report_details.original_audio.startsWith('data:') ? req.report_details.original_audio : `${BASE_URL}${req.report_details.original_audio}`} controls style={{ width: '100%', height: '35px' }} />
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         );
                       })()}

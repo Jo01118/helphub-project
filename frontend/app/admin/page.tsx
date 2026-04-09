@@ -34,12 +34,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Check local storage for quick bypass in same session
-    if (!localStorage.getItem('admin_access')) {
-      router.push('/');
-      return;
+    const adminToken = localStorage.getItem('admin_access');
+    if (adminToken) {
+      setIsAuthenticated(true);
+      fetchAdminData();
     }
-    setIsAuthenticated(true);
-    fetchAdminData();
     setIsCheckingAuth(false);
 
     const handleHash = () => {
@@ -89,18 +88,27 @@ export default function AdminDashboard() {
       setReports(data);
       sessionStorage.setItem('admin_reports_cache', JSON.stringify(data));
       
-      // Background geocoding with batched update
+      // Background geocoding with sequential update to respect rate limits
       const updatedData = [...data];
-      const promises = data.map(async (r: any, idx: number) => {
-        if (!r.location_name) {
-          const name = await getLocationName(r.latitude, r.longitude);
-          updatedData[idx] = { ...updatedData[idx], location_name: name };
+      const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+      
+      const processGeocoding = async () => {
+        for (let i = 0; i < data.length; i++) {
+          const r = data[i];
+          if (!r.location_name) {
+             try {
+               const name = await getLocationName(r.latitude, r.longitude);
+               updatedData[i] = { ...updatedData[i], location_name: name };
+               setReports([...updatedData]);
+               sessionStorage.setItem('admin_reports_cache', JSON.stringify(updatedData));
+               await delay(1000); // Wait 1 second between requests
+             } catch (geerr) {
+               console.warn("Geocoding individual report failed", geerr);
+             }
+          }
         }
-      });
-      Promise.all(promises).then(() => {
-        setReports(updatedData);
-        sessionStorage.setItem('admin_reports_cache', JSON.stringify(updatedData));
-      });
+      };
+      processGeocoding();
     } catch (err) {
       console.error(err);
     } finally {
@@ -114,7 +122,7 @@ export default function AdminDashboard() {
 
     setLoadingVolunteers(true);
     try {
-      const data = await request('/auth/volunteers/applicants/');
+      const data = await request('/volunteers/');
       setVolunteers(data);
       sessionStorage.setItem('admin_volunteers_cache', JSON.stringify(data));
     } catch (err) {
@@ -138,7 +146,10 @@ export default function AdminDashboard() {
       setAssignmentRequests(reqData.filter((r:any) => r.status === 'PENDING'));
     } catch (err: any) {
       console.error(err);
-      if(err.message.includes('token')) setIsAuthenticated(false);
+      const errMsg = err.message.toLowerCase();
+      if(errMsg.includes('token') || errMsg.includes('authentication') || errMsg.includes('denied') || errMsg.includes('login')) {
+        setIsAuthenticated(false);
+      }
     } finally {
       setIsRefreshing(false);
     }
@@ -451,14 +462,15 @@ export default function AdminDashboard() {
                               <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>{issue || 'not provided'}</strong>
                             </div>
                           </div>
-                          <div style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }}>
-                            <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice Transcript:</strong>
-                            <p style={{ margin: 0, fontSize: '0.95rem', whiteSpace: 'pre-wrap', color: voicePart ? 'var(--text-main)' : 'var(--text-muted)' }}>{voicePart || 'not provided'}</p>
-                          </div>
-
-                          {report.original_audio && (
-                            <div style={{ marginBottom: '10px' }}>
-                              <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%', height: '40px' }} />
+                          
+                          {(voicePart || report.original_audio) && (
+                            <div style={{ marginBottom: '10px', backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '5px', border: '1px solid var(--border)' }}>
+                              <strong style={{ display: 'inline-block', marginBottom: '5px' }}>🎤 Voice:</strong>
+                              {report.original_audio && (
+                                <div style={{ marginTop: '10px' }}>
+                                  <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%', height: '45px' }} />
+                                </div>
+                              )}
                             </div>
                           )}
 

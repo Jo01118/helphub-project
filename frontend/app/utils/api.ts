@@ -21,7 +21,11 @@ export const request = async (endpoint: string, options: RequestInit = {}) => {
     if (response.status === 401 && token) {
       localStorage.removeItem('access');
       localStorage.removeItem('refresh');
-      throw new Error("Time out pls login again");
+      throw new Error("Authentication failed: session expired or invalid. Please login again.");
+    }
+
+    if (response.status === 403) {
+      throw new Error("Permission denied: you do not have access to this resource.");
     }
     
     if (errorData.detail) throw new Error(errorData.detail);
@@ -33,7 +37,7 @@ export const request = async (endpoint: string, options: RequestInit = {}) => {
       throw new Error(`${firstKey.toUpperCase()}: ${errorData[firstKey][0]}`);
     }
 
-    throw new Error('API Request Failed');
+    throw new Error(`API Request Failed: ${response.status} ${response.statusText}`);
   }
 
   // Handle empty responses (like 204 No Content for DELETE)
