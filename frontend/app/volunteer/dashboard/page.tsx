@@ -459,12 +459,12 @@ export default function VolunteerDashboard() {
                               </div>
                             </div>
                             
-                            {(voicePart || report.original_audio || req.report_details?.original_audio) && (
+                            {(voicePart || report.original_audio) && (
                               <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                                 <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice:</strong>
-                                {(report.original_audio || req.report_details?.original_audio) && (
+                                {report.original_audio && (
                                   <div style={{ marginTop: '5px' }}>
-                                    <audio src={(report.original_audio || req.report_details?.original_audio).startsWith('http') || (report.original_audio || req.report_details?.original_audio).startsWith('data:') ? (report.original_audio || req.report_details?.original_audio) : `${BASE_URL}${(report.original_audio || req.report_details?.original_audio)}`} controls style={{ width: '100%', height: '35px' }} />
+                                    <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%', height: '35px' }} />
                                   </div>
                                 )}
                               </div>
@@ -613,12 +613,12 @@ export default function VolunteerDashboard() {
                                 <strong style={{ fontSize: '0.9rem' }}>{issue || 'not provided'}</strong>
                               </div>
                             </div>
-                            {(voicePart || report.original_audio || req.report_details?.original_audio) && (
+                            {(voicePart || report.original_audio) && (
                               <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border)' }}>
                                 <strong style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px' }}>🎤 Voice:</strong>
-                                {(report.original_audio || req.report_details?.original_audio) && (
+                                {report.original_audio && (
                                   <div style={{ marginTop: '5px' }}>
-                                    <audio src={(report.original_audio || req.report_details?.original_audio).startsWith('http') || (report.original_audio || req.report_details?.original_audio).startsWith('data:') ? (report.original_audio || req.report_details?.original_audio) : `${BASE_URL}${(report.original_audio || req.report_details?.original_audio)}`} controls style={{ width: '100%', height: '35px' }} />
+                                    <audio src={report.original_audio.startsWith('http') || report.original_audio.startsWith('data:') ? report.original_audio : `${BASE_URL}${report.original_audio}`} controls style={{ width: '100%', height: '35px' }} />
                                   </div>
                                 )}
                               </div>
