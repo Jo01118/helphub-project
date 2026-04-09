@@ -19,8 +19,8 @@ export default function Navigation() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Preemptively wake up Render Free Tier server silently in the background!
-      // Using a HEAD request to avoid downloading unnecessary data.
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-ytdv.onrender.com/api'}/reports/`, { method: 'HEAD' })
+      // Using a small GET request to ensure the server starts processing.
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-ytdv.onrender.com/api'}/auth/me/`)
         .catch(() => {}); // ignore errors silently
 
       // Register Service Worker

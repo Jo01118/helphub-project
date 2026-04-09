@@ -11,16 +11,20 @@ export default function VolunteerPortal() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [mode, setMode] = useState<'apply' | 'login' | 'status' | 'forgot'>('apply');
+  const [isWakingUp, setIsWakingUp] = useState(false);
 
   useEffect(() => {
+    // Prefetch for instant transition
+    router.prefetch('/volunteer/dashboard');
+
     const token = localStorage.getItem('access');
     const role = localStorage.getItem('userRole');
     if (token && role === 'VOLUNTEER') {
-      window.location.href = '/volunteer/dashboard';
+      router.push('/volunteer/dashboard');
     } else {
       setIsCheckingAuth(false);
     }
-  }, []);
+  }, [router]);
 
   // Form states
   const [name, setName] = useState('');
@@ -67,8 +71,8 @@ export default function VolunteerPortal() {
       localStorage.setItem('userRole', 'VOLUNTEER');
       setSuccessMsg('Account recovered successfully. Redirecting...');
       setTimeout(() => {
-        window.location.href = '/volunteer/dashboard';
-      }, 1500);
+        router.push('/volunteer/dashboard');
+      }, 1000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Recovery failed. Check your code or credentials.');
     } finally { 
@@ -81,6 +85,7 @@ export default function VolunteerPortal() {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
+    const wakeTimer = setTimeout(() => setIsWakingUp(true), 3000);
 
     try {
       if (mode === 'status') {
@@ -130,8 +135,14 @@ export default function VolunteerPortal() {
       }
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err.message || 'Authentication failed. Check your details.');
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setErrorMsg('The server is taking a moment to wake up (Render Free Tier). Please wait or try again in a few seconds.');
+      } else {
+        setErrorMsg(err.message || 'Authentication failed. Check your details.');
+      }
     } finally {
+      clearTimeout(wakeTimer);
+      setIsWakingUp(false);
       setLoading(false);
     }
   };
@@ -247,7 +258,7 @@ export default function VolunteerPortal() {
             </div>
 
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Submit Application'}
+              {loading ? (isWakingUp ? 'Waking up server...' : 'Processing...') : 'Submit Application'}
             </button>
           </form>
         ) : mode === 'status' ? (
@@ -364,7 +375,7 @@ export default function VolunteerPortal() {
             </p>
 
             <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', backgroundColor: 'var(--secondary)', color: 'black' }} disabled={loading}>
-              {loading ? 'Processing...' : 'Login'}
+              {loading ? (isWakingUp ? 'Waking up server...' : 'Processing...') : 'Login'}
             </button>
           </form>
         )}
